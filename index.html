@@ -1753,8 +1753,11 @@ table.road td.num.num-marked.num-marked-click.zp-sc-triple-hit::before{ backgrou
 /* 2026-09-22 使用者指示：每區第6期(最後一列)改用底色標示(比外框明顯)，用「線色組1」(--mark-line-color色系PALETTE_GREEN最淺那格#E6F7EC)填底色，見render()裡的zp-sc-last-row。
    2026-09-22 使用者回報「第六期的號碼太不清楚」：暗色系底下文字原本繼承白字，疊在這個淺色底上幾乎看不見；強制文字改深色，亮色/暗色系都固定黑字 */
 table.road tr.zp-sc-synth.zp-sc-last-row td{ background:#E6F7EC !important; color:#000 !important; }
+/* 2026-09-23 使用者回報「空白欄位底色不見了」：第6期若是空白期、又用第四招選過號(num-picked)，會被下面「抓牌畫面 num-picked 底色透明」那條(權重較高)蓋成透明，只剩沒選號的格子有底色。這裡用更高權重補回 */
+body.zhuapai-mode table.road tr.zp-sc-synth.zp-sc-last-row td.num.num-picked{ background:#E6F7EC !important; }
 html body #zhuapai-btn.zp-sc-on.zp-sc-on{ background-color:#FFD700 !important; color:#000 !important; }
 body.zp-sanceng #data-blank-divider-line{ display:none !important; }
+body.zhuapai-mode #data-blank-divider-line{ display:none !important; } /* 2026-09-23 使用者指示：抓牌畫面不要這條分界紅線 */
 #zp-sc-toast{ position:fixed; left:50%; top:42%; transform:translate(-50%,-50%); max-width:86vw; background:rgba(0,0,0,.82); color:#fff; padding:10px 16px; border-radius:8px; font-size:16px; line-height:1.4; z-index:1300; opacity:0; pointer-events:none; transition:opacity .2s; text-align:center; }
 #zp-sc-toast.show{ opacity:1; }
 </style>
@@ -2900,7 +2903,7 @@ const LONG_PRESS_MOVE_TOLERANCE=10;
 let longPressTimer=null;
 let longPressStartX=null,longPressStartY=null,longPressTargetTd=null;
 function cancelLongPress(){clearTimeout(longPressTimer);longPressTimer=null;longPressTargetTd=null}
-panels.addEventListener("pointerdown",function(e){if(!marksAllowed())return;const td=e.target.closest("td.num.pending, td.num.num-picked");if(!td)return;const tdTr=td.closest("tr");/* 2026-09-02：使用者澄清「還是一樣前三排」——長按選號盤維持只限前3排空白列(tr.future)，不是限制本身的問題；真正要修的是截圖沒把已選號畫進圖裡，還原成原本的前3排限制 */const firstTwoFutureRows=Array.prototype.slice.call(panels.querySelectorAll("tr.future")).slice(0,3);if(firstTwoFutureRows.indexOf(tdTr)===-1)return;longPressStartX=e.clientX;longPressStartY=e.clientY;longPressTargetTd=td;clearTimeout(longPressTimer);longPressTimer=setTimeout(function(){if(longPressTargetTd)openNumPicker(longPressTargetTd);longPressTimer=null},LONG_PRESS_MS)});
+panels.addEventListener("pointerdown",function(e){if(!marksAllowed())return;const td=e.target.closest("td.num.pending, td.num.num-picked");if(!td)return;const tdTr=td.closest("tr");/* 2026-09-02：使用者澄清「還是一樣前三排」——長按選號盤維持只限前3排空白列(tr.future)，不是限制本身的問題；真正要修的是截圖沒把已選號畫進圖裡，還原成原本的前3排限制 *//* 2026-09-23 使用者指示：改成空白期第4～7列才有效、前3列無效——跟下一期開出的號碼隔開，註記不會跟新開獎號碼混淆(抓牌註記欄 __zpNextFreePendingCell 同步) */const pickFutureRows=Array.prototype.slice.call(panels.querySelectorAll("tr.future")).slice(3,7);if(pickFutureRows.indexOf(tdTr)===-1)return;longPressStartX=e.clientX;longPressStartY=e.clientY;longPressTargetTd=td;clearTimeout(longPressTimer);longPressTimer=setTimeout(function(){if(longPressTargetTd)openNumPicker(longPressTargetTd);longPressTimer=null},LONG_PRESS_MS)});
 panels.addEventListener("pointermove",function(e){if(!longPressTimer)return;const dist=Math.hypot(e.clientX-longPressStartX,e.clientY-longPressStartY);if(dist>LONG_PRESS_MOVE_TOLERANCE)cancelLongPress()});
 panels.addEventListener("pointerup",cancelLongPress);
 panels.addEventListener("pointercancel",cancelLongPress);
@@ -4076,7 +4079,7 @@ function __zpRenderPickCol(){
     __zpCol.appendChild(cell)});
 }
 window.__zpRenderPickCol=__zpRenderPickCol;
-function __zpNextFreePendingCell(){const futureTrs=Array.prototype.slice.call(panels.querySelectorAll("tr.future")).slice(0,3);
+function __zpNextFreePendingCell(){const futureTrs=Array.prototype.slice.call(panels.querySelectorAll("tr.future")).slice(3,7);/* 空白期第4～7列，跟全頁第四招同一範圍 */
   for(const tr of futureTrs){const tds=Array.prototype.slice.call(tr.querySelectorAll("td.num"));for(const td of tds){if(td.classList.contains("pending")&&!td.classList.contains("num-picked"))return td}}return null}
 /* 選號盤是在手指還按著的時候跳出來的，會剛好蓋在手指底下；手指一放開，那一下會被當成「點了選號盤上的某個號碼」而誤選。
    所以從左欄長按開盤後，先把「放開的那一下」吃掉，等手指離開螢幕之後的點擊才算數。 */
@@ -4160,16 +4163,16 @@ window.__zpBorrowRows=function(on){
      /* 2026-09-22 使用者回報「抓牌捲動不太順暢」：原本每跨過一列才 applyCModeScrollOffset(k) 跳一格，每跳一格都整張表重排(拆備列→200列逐列改顯示→再備列→重畫註記欄/遮片)，又頓又不跟手。
         改用主程式的平滑捲動 API(window.__cModeDragScroll：預備列＋transform 連續位移，跨半列才換 k)，表格跟著手指走；放手 end() 才做一次真正的重排。begin() 是給「桿子拖到底」設計的，yLimit 改成手指起點，move() 傳鏡射座標即可得到「位移＝手指位移」。 */
      __sSmooth=false;try{const __api=window.__cModeDragScroll;if(__api&&!__api.active&&__api.begin(e.clientY,1)){const __ov=document.getElementById("c-drag-scroll-ab");if(__ov)__ov.remove();/* 抓牌沒有上下桿，不要 A/B 固定框 */__api.yLimit=e.clientY;__sStartY=e.clientY;__sK0=cModeScrollOffset;{const __w=getCModeScrollBaseWindow();let d=0;if(__w){for(let i=0;i<__w.startIndex;i++){if(__w.rows[i].querySelector("td.num"))d++}}__sMaxK=d}__sSmooth=true}}catch(err){__sSmooth=false}}
-   if(__sSmooth){const __api=window.__cModeDragScroll;if(!__api||!__api.active){__sSmooth=false}else{const rv=Math.max(8,__sRowH);let d=e.clientY-__sStartY;d=Math.max(-__sK0*rv,Math.min((__sMaxK-__sK0)*rv,d));/* 上限＝上方真正有期數的列數(表頭不捲進來)，下限＝回到 k=0 */__api.move(__sStartY-d);/* 連線圖層整層跟著表格位移(表格視覺位移＝手指位移 d)，放手後清掉位移再重畫 */window.__zpLineFollow=true;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform="translate(0px,"+d.toFixed(2)+"px)"}if(e.cancelable)e.preventDefault();return}}
+   if(__sSmooth){const __api=window.__cModeDragScroll;if(!__api||!__api.active){__sSmooth=false}else{const rv=Math.max(8,__sRowH);let d=e.clientY-__sStartY;d=Math.max(-__sK0*rv,Math.min((__sMaxK-__sK0)*rv,d));/* 上限＝上方真正有期數的列數(表頭不捲進來)，下限＝回到 k=0 */__api.move(__sStartY-d);/* 連線圖層整層跟著表格位移(表格視覺位移＝手指位移 d)，放手後清掉位移再重畫 */window.__zpLineFollow=true;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform="translate(0px,"+d.toFixed(2)+"px)"}/* 2026-09-23 使用者回報「紅線沒有跟著捲動」：分界線是獨立元素(position:fixed)，沒被接進這套跟手指位移的邏輯，拖曳中完全不動；比照連線圖層同樣套用位移，放手後由refreshBlankPeriodFrame()量到最終位置再清掉這個位移 */{const __dl=document.getElementById("data-blank-divider-line");if(__dl)__dl.style.transform="translate(0px,"+d.toFixed(2)+"px)"}if(e.cancelable)e.preventDefault();return}}
    let k=__sK0+Math.round(dy/Math.max(8,__sRowH));{const __w=getCModeScrollBaseWindow();let __dataAbove=0;if(__w){for(let i=0;i<__w.startIndex;i++){if(__w.rows[i].querySelector('td.num'))__dataAbove++}}/* 上方只算真正有期數的列，表頭那一列不能捲進來 */k=Math.max(0,Math.min(k,__dataAbove))}/* 上限＝上方實際還有幾期＝單子期數-18，會跟著首頁的空白期設定連動 */
    if(k!==__sLastK){applyCModeScrollOffset(k);__sLastK=cModeScrollOffset;
      /* 視窗位移後整張表是用0.15秒的動畫滑到定位的，連線要等它到位再重畫一次，不然線會留在舊位置、跟標定的號碼脫節 */__sRedrawLines();
      if(typeof refreshBlankPeriodFrame==="function")refreshBlankPeriodFrame();
      if(typeof window.__zpRenderPickCol==="function")window.__zpRenderPickCol()}
    if(e.cancelable)e.preventDefault()},true);
- ["pointerup","pointercancel"].forEach(function(n){document.addEventListener(n,function(e){__sActive.delete(e.pointerId);if(e.pointerId===__sId){if(__sSmooth){__sSmooth=false;try{const __api=window.__cModeDragScroll;if(__api&&__api.active)__api.end()}catch(err){}/* 2026-09-22 使用者回報「畫線後單指捲動，線不見了」：放手後表格會分好幾步才定位(重排視窗→120ms 後備列→修正位移)，只補畫一次可能量到中途的位置或被裁切掉；比照 addConnection 的做法，放手後 0/100/300/600/1000/2000ms 各補畫一次，並保險清掉拖曳狀態(c-drag-scroll 會把連線 svg 藏起來) */document.body.classList.remove("c-drag-scroll");{const __ov=document.getElementById("c-drag-scroll-ab");if(__ov)__ov.remove()}window.__zpLineFollow=false;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform=""}__sLastK=cModeScrollOffset;__sRedrawLines();[100,300,600,1000,2000].forEach(function(delay){setTimeout(function(){if(typeof renderConnections==="function")requestAnimationFrame(renderConnections)},delay)});if(typeof refreshBlankPeriodFrame==="function")refreshBlankPeriodFrame();if(typeof window.__zpRenderPickCol==="function")window.__zpRenderPickCol();if(typeof window.__zpBottomMask==="function")setTimeout(window.__zpBottomMask,60)}__sOn=false;__sDecided=null;__sId=null}},true)});
+ ["pointerup","pointercancel"].forEach(function(n){document.addEventListener(n,function(e){__sActive.delete(e.pointerId);if(e.pointerId===__sId){if(__sSmooth){__sSmooth=false;try{const __api=window.__cModeDragScroll;if(__api&&__api.active)__api.end()}catch(err){}/* 2026-09-22 使用者回報「畫線後單指捲動，線不見了」：放手後表格會分好幾步才定位(重排視窗→120ms 後備列→修正位移)，只補畫一次可能量到中途的位置或被裁切掉；比照 addConnection 的做法，放手後 0/100/300/600/1000/2000ms 各補畫一次，並保險清掉拖曳狀態(c-drag-scroll 會把連線 svg 藏起來) */document.body.classList.remove("c-drag-scroll");{const __ov=document.getElementById("c-drag-scroll-ab");if(__ov)__ov.remove()}window.__zpLineFollow=false;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform=""}{const __dl=document.getElementById("data-blank-divider-line");if(__dl)__dl.style.transform=""}__sLastK=cModeScrollOffset;__sRedrawLines();[100,300,600,1000,2000].forEach(function(delay){setTimeout(function(){if(typeof renderConnections==="function")requestAnimationFrame(renderConnections)},delay)});if(typeof refreshBlankPeriodFrame==="function")refreshBlankPeriodFrame();if(typeof window.__zpRenderPickCol==="function")window.__zpRenderPickCol();if(typeof window.__zpBottomMask==="function")setTimeout(window.__zpBottomMask,60)}__sOn=false;__sDecided=null;__sId=null}},true)});
  /* 2026-09-22 保險：若 pointerup 沒送到(被別的手勢/瀏覽器吃掉)，手指全部離開螢幕時也收尾，避免 c-drag-scroll 留著把連線藏起來、表格停在半路 */
- document.addEventListener("touchend",function(e){if(e.touches&&e.touches.length===0&&__sSmooth){__sSmooth=false;try{const __api=window.__cModeDragScroll;if(__api&&__api.active)__api.end()}catch(err){}document.body.classList.remove("c-drag-scroll");{const __ov=document.getElementById("c-drag-scroll-ab");if(__ov)__ov.remove()}window.__zpLineFollow=false;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform=""}__sOn=false;__sDecided=null;__sId=null;__sLastK=cModeScrollOffset;__sRedrawLines();[100,300,600,1000,2000].forEach(function(delay){setTimeout(function(){if(typeof renderConnections==="function")requestAnimationFrame(renderConnections)},delay)});if(typeof window.__zpRenderPickCol==="function")window.__zpRenderPickCol();if(typeof window.__zpBottomMask==="function")setTimeout(window.__zpBottomMask,60)}},true);
+ document.addEventListener("touchend",function(e){if(e.touches&&e.touches.length===0&&__sSmooth){__sSmooth=false;try{const __api=window.__cModeDragScroll;if(__api&&__api.active)__api.end()}catch(err){}document.body.classList.remove("c-drag-scroll");{const __ov=document.getElementById("c-drag-scroll-ab");if(__ov)__ov.remove()}window.__zpLineFollow=false;{const __svg=document.getElementById("connect-svg");if(__svg)__svg.style.transform=""}{const __dl=document.getElementById("data-blank-divider-line");if(__dl)__dl.style.transform=""}__sOn=false;__sDecided=null;__sId=null;__sLastK=cModeScrollOffset;__sRedrawLines();[100,300,600,1000,2000].forEach(function(delay){setTimeout(function(){if(typeof renderConnections==="function")requestAnimationFrame(renderConnections)},delay)});if(typeof window.__zpRenderPickCol==="function")window.__zpRenderPickCol();if(typeof window.__zpBottomMask==="function")setTimeout(window.__zpBottomMask,60)}},true);
  window.__zpScrollInfo=function(){const w=getCModeScrollBaseWindow();let d=0;if(w){for(let i=0;i<w.startIndex;i++){if(w.rows[i].querySelector('td.num'))d++}}return{k:cModeScrollOffset,maxK:d,dataRowsAbove:d,borrowed:__zpBorrowed.length}};
  window.__zpScrollTo=function(k){let d=0;const w=getCModeScrollBaseWindow();if(w){for(let i=0;i<w.startIndex;i++){if(w.rows[i].querySelector('td.num'))d++}}applyCModeScrollOffset(Math.max(0,Math.min(k|0,d)));__sRedrawLines();return cModeScrollOffset};
 }
@@ -4439,10 +4442,11 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
  }
  /* 2026-09-22 使用者指示：標的號碼(zp-sc-key，例03)如果第一區、第二區第6期都出現同一個號碼(任一欄即可，例38)，
     從標的畫線到那個號碼所在的格子，用外框線色(跟三區外框#c62828同色，區別於十字差那組線的線色)。
-    只比對第一、二區(跟十字差驗證範圍一致，第三區不用再驗證)；只在三層+三層段落+定顯時計算 */
+    只比對第一、二區(跟十字差驗證範圍一致，第三區不用再驗證)；三層+三層段落時計算。
+    2026-09-23 使用者指示：全顯也要這個邏輯(原本只有定顯)，定顯、全顯都畫 */
  function applyKeyRowSixLinks(){
    ST.keyRowSixLinks=[];
-   if(!(ST.on&&ST.mode===0&&window.fullPageSheetMode==="同"&&ST.zones.length>=3))return;
+   if(!(ST.on&&ST.mode===0&&(window.fullPageSheetMode==="同"||window.fullPageSheetMode==="異")&&ST.zones.length>=3))return;
    const z0=ST.zones[0],z1=ST.zones[1];
    const numMap=function(tr){const m={};if(!tr)return m;Array.prototype.forEach.call(tr.querySelectorAll("td.num"),function(td){const n=normalizedNum(td);if(n&&!m[n])m[n]=td});return m};
    const map0=numMap(z0[5]),map1=numMap(z1[5]);
