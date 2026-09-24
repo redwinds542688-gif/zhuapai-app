@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 17:12";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 17:27";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios")}catch(e){}})();</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-09-24 17:27  首頁標題「名揚四海・彩券系統」字級改成跟「六合彩」等玩法鍵一樣大(26px × 螢幕倍率，原本固定 15px)。
    2026-09-24 17:12  圖示換成使用者提供的「抓539」圖(黃底黑字「抓」＋彩色 539、紅框)，iPhone 與 Android 共用同一張；sw.js 快取版本升為 zhua539-v2。
    2026-09-24 17:10  安裝包：同一個程式、同一個圖示(抓539)供 iPhone 與 Android 安裝。新增 manifest.json、sw.js、圖示；https 下註冊 sw.js；
                      Android 可安裝時上方顯示「安裝抓539」說明框(按安裝跳系統視窗、按 ✕ 不再出現)。iPhone 維持「分享→加入主畫面」說明。
@@ -1686,6 +1687,8 @@ body:not(.recent-only-mode):not(.c-mode-active):not(.pinch-fullscreen-mode):not(
   #home-exit-btn .fullpage-mode-label{ font-size:calc(30px * var(--ui-scale)); }
 </style>
 <style id="new-system-layout">
+/* 2026-09-24 17:27 使用者指示「名揚四海・彩券系統這幾個字，跟下面六合彩按鍵的字體一樣大」：標題字級改成跟玩法鍵同一條規則(26px × 螢幕倍率 --ui-scale)，原本寫死 15px。iPhone、Android 都適用 */
+.brand-title-overlay{ font-size:calc(26px * var(--ui-scale)); }
 /* 新抓牌系統自己的版面：主畫面按鍵列＝期數± → 設定 → 印單；左下「抓牌」鍵外觀比照主程式的「結束」鍵 */
 #clean-sheet-btn, .sheet-size-btn{ font-size:calc(26px * var(--ui-scale)); letter-spacing:1px; }
 #zhuapai-btn{ display:flex; overflow:hidden; padding:0; background:#8a8a8a !important; color:#ffffff !important; animation:none; opacity:1; z-index:1000; left:-9999px; top:-9999px;
