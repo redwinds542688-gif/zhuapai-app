@@ -1,0 +1,25 @@
+抓539 安裝包（iPhone、Android 共用同一個程式、同一個圖示）
+============================================================
+檔案（全部放在 zhuapai-app repo 的最外層，跟 index.html 同一層，不要放進資料夾）：
+  index.html              程式本體（自動判斷 iPhone / Android）
+  manifest.json           App 名稱「抓539」與圖示設定
+  sw.js                   離線背景程式（Android 可安裝的條件；沒網路也能開）
+  icon-192.png            圖示（抓539）
+  icon-512.png            圖示（抓539，大）
+  icon-192-maskable.png   Android 圓形/方形裁切用圖示
+  icon-512-maskable.png   同上（大）
+  apple-touch-icon.png    iPhone 主畫面圖示（同一張 抓539）
+
+上傳步驟：
+  1. 電腦打開 GitHub 的 zhuapai-app repo → 「Add file」→「Upload files」
+  2. 把這 8 個檔案一次全部拖進去（上傳說明.txt 不用傳）
+  3. 按「Commit changes」，等 1～2 分鐘
+
+安裝：
+  Android（Chrome）：打開 https://redwinds542688-gif.github.io/zhuapai-app/
+                     上方會出現「安裝抓539」→ 按「安裝」。
+                     沒出現的話：右上角「⋮」→「安裝應用程式」或「加到主畫面」。
+  iPhone（Safari）： 打開同一個網址，上方會出現說明 →
+                     「分享」→「加入主畫面」→「新增」。
+
+已經裝過舊的「抓539」圖示：先把舊圖示刪掉，再照上面重新安裝一次，圖示才會換成 抓539。

@@ -2,9 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 16:50";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 17:12";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios")}catch(e){}})();</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-09-24 17:12  圖示換成使用者提供的「抓539」圖(黃底黑字「抓」＋彩色 539、紅框)，iPhone 與 Android 共用同一張；sw.js 快取版本升為 zhua539-v2。
+   2026-09-24 17:10  安裝包：同一個程式、同一個圖示(抓539)供 iPhone 與 Android 安裝。新增 manifest.json、sw.js、圖示；https 下註冊 sw.js；
+                     Android 可安裝時上方顯示「安裝抓539」說明框(按安裝跳系統視窗、按 ✕ 不再出現)。iPhone 維持「分享→加入主畫面」說明。
+   2026-09-24 17:04  iPhone 安裝說明：iPhone Safari 不會自動跳安裝提示，改在 iPhone 用 Safari 開網頁(尚未加入主畫面)時於上方顯示一次「分享→加入主畫面」說明，按 ✕ 後不再出現。Android、電腦不顯示。
    2026-09-24 16:50  三層：第一、二區第6期的共同號碼(例 02、04)補上滿格標準標記(第二招整格底色＋框色)；條件同紅線(三層段落＋定顯/全顯)。iPhone、Android 都適用。
    2026-09-24 16:21  三層連線改「取最短距離」(iPhone、Android 都適用)：
                      綠線(十字差)：多個十字差都成立時，取兩區連線總長最短的那個(原本取 -10/-1/0/+1/+10 順序第一個)。
@@ -54,6 +58,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="抓539" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <link rel="manifest" href="manifest.json" />
 <script>
 /* 2026-09-14：號碼在格子裡置中（畫面與存圖共用）
@@ -4809,5 +4814,52 @@ boot().catch(function(e){console.error("boot失敗",e)});
   run();
 })();
 </script>
+<script>/* 2026-09-24 17:04 使用者回報「安裝沒有提示安裝」：iPhone/iPad 的 Safari 規定不會自動跳出安裝提示(只有 Android Chrome 會)，
+   要手動按「分享」→「加入主畫面」。這裡在 iPhone 用 Safari 開網頁(還沒加入主畫面)時，於畫面上方顯示一次安裝說明，按 ✕ 關掉後不再出現。
+   已經從主畫面圖示開啟(standalone)時不顯示；Android、電腦完全不顯示。 */
+(function(){try{
+  if(!document.documentElement.classList.contains("is-ios"))return;
+  var standalone=window.navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+  if(standalone)return;
+  if(location.protocol!=="https:"&&location.protocol!=="http:")return;
+  try{if(localStorage.getItem("ios_install_hint_closed")==="1")return}catch(e){}
+  var show=function(){
+    var d=document.createElement("div");d.id="ios-install-hint";
+    d.style.cssText="position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 8px);z-index:100000;background:#1c1c1e;color:#fff;border:2px solid #FFD700;border-radius:12px;padding:12px 40px 12px 14px;font:600 16px/1.5 -apple-system,'PingFang TC',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.4)";
+    d.innerHTML='安裝「抓539」到主畫面：<br>1. 點 Safari 下方的「分享」<span style="display:inline-block;border:1.5px solid #fff;border-radius:4px;padding:0 5px;margin:0 2px">⬆</span><br>2. 往下滑，選「加入主畫面」<br>3. 按右上角「新增」';
+    var x=document.createElement("button");x.type="button";x.textContent="✕";x.setAttribute("aria-label","關閉");
+    x.style.cssText="position:absolute;top:6px;right:6px;width:32px;height:32px;border:0;border-radius:16px;background:#555;color:#fff;font-size:18px;line-height:32px;padding:0";
+    x.addEventListener("click",function(e){e.stopPropagation();d.remove();try{localStorage.setItem("ios_install_hint_closed","1")}catch(err){}});
+    d.appendChild(x);document.body.appendChild(d)};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(show,800)});else setTimeout(show,800);
+}catch(e){}})();</script>
+<script>/* 2026-09-24 17:10 安裝包(iPhone、Android 共用同一個程式、同一個圖示)：
+   ① 在 https 網址下註冊離線背景程式 sw.js(Android Chrome「可安裝」的條件之一；沒網路也能開)。本機檔案開啟(content://、file://)不註冊，不受影響。
+   ② Android：Chrome 判定可安裝時(beforeinstallprompt)，畫面上方顯示「安裝抓539」說明框，按「安裝」就跳出系統安裝視窗；按 ✕ 後不再出現。
+      iPhone 不會有這個事件(蘋果規定)，改用上面那段「分享→加入主畫面」說明。已從主畫面圖示開啟時都不顯示。 */
+(function(){
+  try{if("serviceWorker" in navigator&&location.protocol==="https:"){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.warn("service worker 註冊失敗",e)})})}}catch(e){}
+  try{
+    var standalone=window.navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+    if(standalone)return;
+    var deferred=null;
+    window.addEventListener("beforeinstallprompt",function(ev){
+      ev.preventDefault();deferred=ev;
+      try{if(localStorage.getItem("android_install_hint_closed")==="1")return}catch(e){}
+      if(document.getElementById("android-install-hint"))return;
+      var d=document.createElement("div");d.id="android-install-hint";
+      d.style.cssText="position:fixed;left:8px;right:8px;top:8px;z-index:100000;background:#1c1c1e;color:#fff;border:2px solid #FFD700;border-radius:12px;padding:12px 44px 12px 12px;display:flex;align-items:center;gap:12px;font:600 16px/1.4 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.4)";
+      var ic=document.createElement("img");ic.src="icon-192.png";ic.alt="";ic.style.cssText="width:44px;height:44px;border-radius:10px;flex:none";
+      var tx=document.createElement("div");tx.style.cssText="flex:1";tx.textContent="安裝「抓539」到主畫面，之後點圖示就能開啟";
+      var go=document.createElement("button");go.type="button";go.textContent="安裝";
+      go.style.cssText="flex:none;border:0;border-radius:8px;background:#FFD700;color:#000;font:800 17px sans-serif;padding:8px 14px";
+      var x=document.createElement("button");x.type="button";x.textContent="✕";x.setAttribute("aria-label","關閉");
+      x.style.cssText="position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:15px;background:#555;color:#fff;font-size:16px;line-height:30px;padding:0";
+      go.addEventListener("click",function(e){e.stopPropagation();if(!deferred)return;d.remove();deferred.prompt();deferred.userChoice.finally(function(){deferred=null})});
+      x.addEventListener("click",function(e){e.stopPropagation();d.remove();try{localStorage.setItem("android_install_hint_closed","1")}catch(err){}});
+      d.appendChild(ic);d.appendChild(tx);d.appendChild(go);d.appendChild(x);document.body.appendChild(d)});
+    window.addEventListener("appinstalled",function(){var d=document.getElementById("android-install-hint");if(d)d.remove()});
+  }catch(e){}
+})();</script>
 </body>
 </html>

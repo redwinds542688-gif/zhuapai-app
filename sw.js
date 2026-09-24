@@ -1,43 +1,33 @@
-/* 抓539 service worker(2026-09-23)
-   目的：讓 Chrome 比較容易判定「可以安裝」而主動跳出安裝提示；順便在沒有網路時還能打開上次看過的畫面。
-   規則：
-   ・只管同一個網站自己的檔案(index.html、manifest.json、圖示)。雲端開獎資料(Worker)、其他網站的檔案一律不碰，照原本方式連線。
-   ・網路優先：有網路就一定拿最新版(上傳新的 index.html 後重新打開就是新版)，順便存一份；沒網路才拿存下來的那份。 */
-const CACHE = "zhua539-v1";
+/* 抓539 離線背景程式(service worker)——iPhone、Android 共用
+   策略：index.html 用「網路優先、離線才用快取」(有網路時一定拿到最新版程式，不會卡在舊版)；
+   manifest／圖示用「快取優先」；跨網域請求(Cloudflare Worker 的開獎資料等)一律不攔、不快取。
+   要強制所有手機更新快取時，把下面 CACHE 的版本字串改掉即可。 */
+const CACHE = "zhua539-v2"; /* v2：換成使用者提供的「抓539」圖示 */
+const SHELL = ["./", "./index.html", "./manifest.json",
+  "./icon-192.png", "./icon-512.png", "./icon-192-maskable.png", "./icon-512-maskable.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(function (c) { return c.addAll(["./", "./index.html", "./manifest.json"]).catch(function () {}); })
-      .then(function () { return self.skipWaiting(); })
-  );
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
 });
-
 self.addEventListener("activate", function (e) {
-  e.waitUntil(
-    caches.keys()
-      .then(function (keys) { return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); })
-      .then(function () { return self.clients.claim(); })
-  );
+  e.waitUntil(caches.keys().then(function (keys) {
+    return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+  }).then(function () { return self.clients.claim(); }));
 });
-
 self.addEventListener("fetch", function (e) {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return; /* 雲端資料、CDN 等外部連線不攔 */
-  e.respondWith(
-    fetch(req)
-      .then(function (res) {
-        if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
-        return res;
-      })
-      .catch(function () {
-        return caches.match(req).then(function (hit) {
-          if (hit) return hit;
-          if (req.mode === "navigate") return caches.match("./index.html").then(function (h) { return h || caches.match("./"); });
-          return Response.error();
-        });
-      })
-  );
+  if (url.origin !== self.location.origin) return; /* 跨網域(雲端資料)不攔 */
+  const isShellPage = req.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("/index.html");
+  if (isShellPage) {
+    e.respondWith(fetch(req).then(function (res) {
+      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(function (c) { c.put("./index.html", copy); }); }
+      return res;
+    }).catch(function () { return caches.match("./index.html").then(function (r) { return r || caches.match("./"); }); }));
+    return;
+  }
+  e.respondWith(caches.match(req).then(function (r) { return r || fetch(req).then(function (res) {
+    if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
+    return res; }); }));
 });
