@@ -34,6 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="抓539" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="manifest.json" />
+<script>/* 程式版本(2026-09-23 起從 v1.0 開始編號)：顯示在「印」鍵選單；跟雲端(Worker)拿資料時一併送出(app＝哪個程式、v＝版本)，之後可依版本決定給不給資料 */window.APP_ID="zhua539";window.APP_VERSION="v1.2";</script>
 <script>
 /* 2026-09-14：號碼在格子裡置中（畫面與存圖共用）
    使用者指示：「只要是號碼在格子裡，不管是什麼字體，不管是螢幕顯示還是存圖檔，號碼都必須在格子裡置中」。
@@ -2442,7 +2443,7 @@ function normalizeCrawlerDate(raw,fallbackCheckedAt){
 }
 async function syncCrawlerDataFromGithub(){
   try{
-    const url=CRAWLER_GITHUB_RAW_URL+"&_ts="+Date.now();
+    const url=CRAWLER_GITHUB_RAW_URL+"&app="+encodeURIComponent(window.APP_ID||"")+"&v="+encodeURIComponent(window.APP_VERSION||"")+"&_ts="+Date.now();
     const fetchPromise=fetch(url,{cache:"no-store"});
     const timeoutPromise=new Promise(function(_,reject){setTimeout(function(){reject(new Error("timeout"))},1e4)});
     const res=await Promise.race([fetchPromise,timeoutPromise]);
@@ -3967,7 +3968,7 @@ function applySheetFont(key){sheetFontOptions().forEach(function(o){document.bod
 window.applySheetFont=applySheetFont;
 window.getSheetFontSetting=getSheetFontSetting;
 applySheetFont(getSheetFontSetting());
-function setupPaperSizeLongPress(btn){const LONG_PRESS_MS=550;let pressTimer=null;let longPressFired=false;const menu=document.createElement("div");menu.id="paper-size-menu";menu.className="paper-size-menu";menu.style.display="none";menu.innerHTML='<div class="paper-size-menu-title">存檔紙張尺寸</div>'+'<button type="button" class="paper-size-option" data-size="A3">A3</button>'+'<button type="button" class="paper-size-option" data-size="A4">A4</button>'+'<div class="paper-size-menu-title" style="margin-top:8px;">開獎單字體</div>'+sheetFontOptions().map(function(o){return '<button type="button" class="paper-size-option sheet-font-option" data-font="'+o.key+'">'+o.label+'</button>'}).join("")+'<div class="paper-size-menu-title" style="margin-top:8px;">色系</div><button type="button" class="paper-size-option app-theme-option" data-theme="light">亮色系</button><button type="button" class="paper-size-option app-theme-option" data-theme="dark">暗色系</button>';document.body.appendChild(menu);/* 第108條：尺寸/印鍵選單加「色系」亮/暗 */menu.querySelectorAll(".app-theme-option").forEach(function(opt){opt.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(window.applyAppTheme)window.applyAppTheme(opt.dataset.theme);menu.querySelectorAll(".app-theme-option").forEach(function(o){o.classList.toggle("active",o.dataset.theme===opt.dataset.theme)})})});(function(){var cur=document.body.classList.contains("theme-dark")?"dark":"light";/* 2026-09-12：使用者截圖回報content://來源開啟時，畫面已是暗色但色系鍵兩顆都不亮——改成直接讀body.theme-dark這個實際套用中的class，不繞去讀localStorage(該環境下localStorage存取可能失敗) */menu.querySelectorAll(".app-theme-option").forEach(function(o){o.classList.toggle("active",o.dataset.theme===cur)})})();
+function setupPaperSizeLongPress(btn){const LONG_PRESS_MS=550;let pressTimer=null;let longPressFired=false;const menu=document.createElement("div");menu.id="paper-size-menu";menu.className="paper-size-menu";menu.style.display="none";menu.innerHTML='<div class="paper-size-menu-title">存檔紙張尺寸</div>'+'<button type="button" class="paper-size-option" data-size="A3">A3</button>'+'<button type="button" class="paper-size-option" data-size="A4">A4</button>'+'<div class="paper-size-menu-title" style="margin-top:8px;">開獎單字體</div>'+sheetFontOptions().map(function(o){return '<button type="button" class="paper-size-option sheet-font-option" data-font="'+o.key+'">'+o.label+'</button>'}).join("")+'<div class="paper-size-menu-title" style="margin-top:8px;">色系</div><button type="button" class="paper-size-option app-theme-option" data-theme="light">亮色系</button><button type="button" class="paper-size-option app-theme-option" data-theme="dark">暗色系</button><div class="paper-size-menu-title" style="margin-top:10px;opacity:.75;">版本 '+(window.APP_VERSION||"")+'</div>';document.body.appendChild(menu);/* 第108條：尺寸/印鍵選單加「色系」亮/暗 */menu.querySelectorAll(".app-theme-option").forEach(function(opt){opt.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(window.applyAppTheme)window.applyAppTheme(opt.dataset.theme);menu.querySelectorAll(".app-theme-option").forEach(function(o){o.classList.toggle("active",o.dataset.theme===opt.dataset.theme)})})});(function(){var cur=document.body.classList.contains("theme-dark")?"dark":"light";/* 2026-09-12：使用者截圖回報content://來源開啟時，畫面已是暗色但色系鍵兩顆都不亮——改成直接讀body.theme-dark這個實際套用中的class，不繞去讀localStorage(該環境下localStorage存取可能失敗) */menu.querySelectorAll(".app-theme-option").forEach(function(o){o.classList.toggle("active",o.dataset.theme===cur)})})();
 /* 2026-08-31：印鍵長按選單加入「開獎單字體」：等距粗/等距細/標準粗/標準細，重點是等距字體(每個數字同寬，列印對齊) */
 menu.querySelectorAll(".sheet-font-option").forEach(function(opt){opt.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();applySheetFont(opt.dataset.font);updateActiveOption();})});
 function updateActiveOption(){const current=getPaperSizeSetting();menu.querySelectorAll(".paper-size-option:not(.sheet-font-option):not(.app-theme-option)").forEach(function(opt){opt.classList.toggle("active",opt.dataset.size===current)});/* 第108條補強(試跑發現)：原本這裡會把「色系」兩顆的active一起清掉(dataset.size不存在)，選單每次打開都看不到目前色系；改為排除並依localStorage重標 */(function(){var cur=document.body.classList.contains("theme-dark")?"dark":"light";/* 2026-09-12：同上，改讀body.theme-dark實際class */menu.querySelectorAll(".app-theme-option").forEach(function(o){o.classList.toggle("active",o.dataset.theme===cur)})})();const curFont=getSheetFontSetting();menu.querySelectorAll(".sheet-font-option").forEach(function(opt){opt.classList.toggle("active",opt.dataset.font===curFont)})}function positionMenu(){const vv=window.visualViewport;const viewportWidth=vv?vv.width:window.innerWidth;const viewportHeight=vv?vv.height:window.innerHeight;const viewportOffsetTop=vv?vv.offsetTop:0;const rect=btn.getBoundingClientRect();menu.style.position="fixed";menu.style.left="0px";menu.style.top="0px";menu.style.visibility="hidden";menu.style.display="flex";const menuRect=menu.getBoundingClientRect();let left=rect.left+rect.width/2-menuRect.width/2;left=Math.max(8,Math.min(left,viewportWidth-menuRect.width-8));let top=rect.bottom+8;menu.style.left=left+"px";menu.style.top=top+"px";menu.style.visibility="visible";const finalRect=menu.getBoundingClientRect();if(finalRect.bottom>viewportOffsetTop+viewportHeight-8){top=Math.max(viewportOffsetTop+8,viewportOffsetTop+viewportHeight-menuRect.height-8);menu.style.top=top+"px"}}/* 2026-08-31：選單打開後，除了點選單裡的項目以外，點畫面任何地方(含表格、按鍵)都直接收起選單，而且那一下不會觸發底下的東西 */let __menuOpenedAt=0,__menuHiddenByBtnAt=0;/* 新抓牌系統：單擊開關用 */function onOutsideTapForMenu(e){if(!menuOpen)return;if(menu.contains(e.target))return;/* 剛打開0.45秒內又點到設定鍵(習慣連點兩下)＝不關，避免一開就關 */if(btn.contains(e.target)&&Date.now()-__menuOpenedAt<450)return;if(btn.contains(e.target))__menuHiddenByBtnAt=Date.now();hideMenu();if(!btn.contains(e.target)){e.preventDefault();e.stopPropagation()}}function showMenu(){updateActiveOption();positionMenu();menuOpen=true;__menuOpenedAt=Date.now();setTimeout(function(){if(!menuOpen)return;document.addEventListener("pointerdown",onOutsideTapForMenu,{capture:true});document.addEventListener("touchstart",onOutsideTapForMenu,{capture:true,passive:false});document.addEventListener("click",onOutsideTapForMenu,{capture:true})},0)}function hideMenu(){menu.style.display="none";menuOpen=false;document.removeEventListener("pointerdown",onOutsideTapForMenu,{capture:true});document.removeEventListener("touchstart",onOutsideTapForMenu,{capture:true});document.removeEventListener("click",onOutsideTapForMenu,{capture:true})}let menuOpen=false;btn.addEventListener("pointerdown",function(e){longPressFired=false;pressTimer=setTimeout(function(){longPressFired=true;showMenu();if(navigator.vibrate)navigator.vibrate(30)},LONG_PRESS_MS)});function cancelTimer(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null}}btn.addEventListener("pointerup",cancelTimer);btn.addEventListener("pointerleave",cancelTimer);btn.addEventListener("pointercancel",cancelTimer);btn.addEventListener("click",function(e){if(longPressFired){e.preventDefault();e.stopPropagation();longPressFired=false;return}if(menuOpen){e.preventDefault();e.stopPropagation();if(Date.now()-__menuOpenedAt<450)return;hideMenu();return}/* 新抓牌系統：這顆是獨立的「設定」鍵，單擊＝開啟設定選單、再點一下＝關閉(主程式原本是長按「印」開、雙擊「印」存檔；長按開啟的原碼保留) */if(Date.now()-__menuHiddenByBtnAt<450)return;showMenu()});menu.querySelectorAll(".paper-size-option").forEach(function(opt){opt.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();/* 修正：只有A3/A4選項才寫入尺寸 */if(opt.dataset.size){setPaperSizeSetting(opt.dataset.size)}updateActiveOption();hideMenu()})})}
@@ -4766,6 +4767,110 @@ boot().catch(function(e){console.error("boot失敗",e)});
   try{new MutationObserver(run).observe(document.body,{attributes:true,attributeFilter:["class"]})}catch(e){}
   try{var hb=document.getElementById("hero-balls");if(hb)new MutationObserver(run).observe(hb,{childList:true})}catch(e){}
   run();
+})();
+</script>
+<script>
+/* 2026-09-23：註冊 service worker(sw.js)——讓手機瀏覽器比較容易主動跳出「安裝抓539」。
+   只在正式網站(https)或本機測試(localhost)才註冊；直接打開手機裡的檔案(content://、file://)時不註冊，也不影響任何功能。 */
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("service worker 註冊失敗(不影響使用)",e)})})}
+</script>
+<script>
+/* ===== 螢幕資訊回傳(2026-09-24，v1.0 起) =====
+   目的：程式分給不同的人、不同的手機，自動收集每支手機的螢幕尺寸與排版狀況，送到 Cloudflare Worker(/report) 存進 KV，
+   用來決定「依比例排版」的規則。
+   ・送什麼：螢幕尺寸、像素倍率、實體解析度、實際可用畫面、瀏海安全距離、直/橫向、開啟方式(桌面App／瀏覽器／檔案)、
+     手機型號與瀏覽器、程式自己量到的排版狀況(格子高、字級、按鍵有沒有超出畫面或重疊、左右有沒有超出)。
+   ・不送：姓名、電話、位置、標定的號碼。
+   ・何時送：同一支手機第一次打開送一筆；之後只有尺寸/開啟方式/版本改變才再送。在首頁量(其他畫面版面不同)，橫向不送(程式只支援直向)。
+   ・失敗不影響任何功能(沒網路、Worker 還沒接好 KV 都一樣)，下次打開再試。
+   ・設定選單(主程式「印」、新抓牌「設定」)裡的「螢幕資訊」可以看目前的數字，並可「立即回傳」。 */
+(function(){
+  var REPORT_BASE="https://lottery-data-gate.redwinds542688.workers.dev/report";
+  var SIG_KEY="539_screen_report_sig";
+  function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function r1(n){return Math.round((+n||0)*10)/10}
+  function deviceId(){var id=lsGet("539_device_id");if(!id||!/^[A-Za-z0-9-]{8,64}$/.test(id)){try{id=crypto.randomUUID()}catch(e){id=Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,12)}lsSet("539_device_id",id)}return id}
+  function openMode(){try{if(window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true)return "app"}catch(e){}return location.protocol==="https:"||location.protocol==="http:"?"web":"file"}
+  function safeArea(){var d=document.createElement("div");d.style.cssText="position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)";document.body.appendChild(d);var cs=getComputedStyle(d);var o={t:r1(parseFloat(cs.paddingTop)),r:r1(parseFloat(cs.paddingRight)),b:r1(parseFloat(cs.paddingBottom)),l:r1(parseFloat(cs.paddingLeft))};d.remove();return o}
+  function onHome(){var b=document.body.classList;return !document.querySelector(".img-overlay.open")&&!b.contains("pinch-fullscreen-mode")&&!b.contains("zhuapai-mode")&&!b.contains("recent-only-mode")&&!b.contains("c-mode-active")}
+  function layoutCheck(){
+    var out={problems:[]};var vw=document.documentElement.clientWidth||innerWidth,vh=innerHeight;
+    var td=Array.prototype.slice.call(document.querySelectorAll("#panels td.num")).find(function(t){var r=t.getBoundingClientRect();return r.height>0&&r.width>0&&!t.classList.contains("pending")});
+    if(td){var r=td.getBoundingClientRect();out.cellW=r1(r.width);out.cellH=r1(r.height);var span=td.querySelector("span")||td;out.fontPx=r1(parseFloat(getComputedStyle(span).fontSize));if(out.fontPx&&out.fontPx<8)out.problems.push("號碼字太小("+out.fontPx+"px)")}
+    var ids=["zhuapai-btn","img-view-btn","home-exit-btn","clean-sheet-btn","sheet-size-btn","blank-minus","blank-plus"];var rects=[];
+    ids.forEach(function(id){var e=document.getElementById(id);if(!e)return;var cs=getComputedStyle(e);var r=e.getBoundingClientRect();if(cs.display==="none"||cs.visibility==="hidden"||r.width<2||r.height<2||r.left<-1000)return;rects.push({id:id,r:r});if(r.left<-1||r.top<-1||r.right>vw+1||r.bottom>vh+1)out.problems.push("按鍵超出畫面:"+id)});
+    for(var i=0;i<rects.length;i++)for(var j=i+1;j<rects.length;j++){var a=rects[i].r,b=rects[j].r;var ox=Math.min(a.right,b.right)-Math.max(a.left,b.left),oy=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);if(ox>2&&oy>2)out.problems.push("按鍵重疊:"+rects[i].id+"/"+rects[j].id)}
+    var sw=document.documentElement.scrollWidth;if(sw>vw+2)out.problems.push("畫面左右超出"+Math.round(sw-vw)+"px");
+    out.buttons=rects.length;return out}
+  async function uaInfo(){var o={ua:(navigator.userAgent||"").slice(0,300)};try{if(navigator.userAgentData){o.mobile=!!navigator.userAgentData.mobile;o.platform=navigator.userAgentData.platform||"";if(navigator.userAgentData.getHighEntropyValues){var h=await navigator.userAgentData.getHighEntropyValues(["model","platformVersion"]);o.model=h.model||"";o.platformVersion=h.platformVersion||""}}}catch(e){}return o}
+  async function collect(){
+    var dpr=window.devicePixelRatio||1;var vv=window.visualViewport;
+    var info={app:window.APP_ID||"",v:window.APP_VERSION||"",deviceId:deviceId(),mode:openMode(),
+      screen:{w:screen.width,h:screen.height,availW:screen.availWidth,availH:screen.availHeight},dpr:r1(dpr*100)/100,
+      physical:{w:Math.round(screen.width*dpr),h:Math.round(screen.height*dpr)},
+      viewport:{w:innerWidth,h:innerHeight,docW:document.documentElement.clientWidth,docH:document.documentElement.clientHeight,vvW:vv?r1(vv.width):null,vvH:vv?r1(vv.height):null},
+      orientation:(screen.orientation&&screen.orientation.type)||(innerWidth>innerHeight?"landscape":"portrait"),
+      safeArea:safeArea(),uiScale:(getComputedStyle(document.documentElement).getPropertyValue("--ui-scale")||"").trim(),
+      theme:document.body.classList.contains("theme-dark")?"dark":"light",lang:navigator.language||""};
+    if(onHome())info.layout=layoutCheck();
+    var u=await uaInfo();for(var k in u)info[k]=u[k];
+    return info}
+  function signature(i){return [i.app,i.v,i.mode,i.screen.w,i.screen.h,i.dpr,i.viewport.docW,i.orientation].join("|")}
+  async function send(force){
+    var i=await collect();
+    if(i.orientation.indexOf("landscape")===0&&!force)return {skipped:"橫向不送"};
+    if(!i.layout&&!force)return {skipped:"不在首頁"};
+    var sig=signature(i);if(!force&&lsGet(SIG_KEY)===sig)return {skipped:"沒有改變"};
+    var key=(typeof CRAWLER_CLIENT_KEY!=="undefined")?CRAWLER_CLIENT_KEY:"";
+    var url=REPORT_BASE+"?key="+encodeURIComponent(key)+"&app="+encodeURIComponent(i.app)+"&v="+encodeURIComponent(i.v);
+    try{var res=await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(i),keepalive:true,cache:"no-store"});
+      var txt="";try{txt=await res.text()}catch(e){}
+      if(res.ok){lsSet(SIG_KEY,sig);return {ok:true}}
+      return {ok:false,status:res.status,body:txt.slice(0,200)}}catch(e){return {ok:false,error:String(e&&e.message||e)}}}
+  window.__screenReportSend=send;window.__screenReportCollect=collect;
+  /* ===== 使用人數(2026-09-24，v1.2 起)：每支手機每天第一次打開送一筆「今天有用」到 Worker(/ping)，Worker 記每支手機的第一次、最後一次使用日與累計使用天數。
+     只送 app、版本、裝置代號(隨機產生，不是手機序號)、開啟方式、型號；同一天重開不再送；沒網路就下次再送。 */
+  function twDay(){try{return new Date().toLocaleDateString("sv-SE",{timeZone:"Asia/Taipei"})}catch(e){return new Date().toISOString().slice(0,10)}}
+  var PING_KEY="539_ping_day";
+  async function ping(force){
+    var day=twDay();if(!force&&lsGet(PING_KEY)===day)return {skipped:"今天送過了"};
+    var u=await uaInfo();
+    var body={app:window.APP_ID||"",v:window.APP_VERSION||"",deviceId:deviceId(),mode:openMode(),model:u.model||"",platform:u.platform||""};
+    var key=(typeof CRAWLER_CLIENT_KEY!=="undefined")?CRAWLER_CLIENT_KEY:"";
+    var url=REPORT_BASE.replace(/\/report$/,"/ping")+"?key="+encodeURIComponent(key)+"&app="+encodeURIComponent(body.app)+"&v="+encodeURIComponent(body.v);
+    try{var res=await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(body),keepalive:true,cache:"no-store"});
+      if(res.ok){lsSet(PING_KEY,day);return {ok:true}}return {ok:false,status:res.status}}catch(e){return {ok:false,error:String(e&&e.message||e)}}}
+  window.__usagePing=ping;
+  window.addEventListener("load",function(){setTimeout(function(){ping(false).catch(function(){})},2000)});
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")setTimeout(function(){ping(false).catch(function(){})},1500)});/* 放在背景隔天再切回來也算一次 */
+  var timer=null;function schedule(ms){clearTimeout(timer);timer=setTimeout(function(){send(false).catch(function(){})},ms)}
+  window.addEventListener("load",function(){schedule(4000)});
+  window.addEventListener("resize",function(){schedule(3000)});
+  /* 設定選單加「螢幕資訊」(選單是開機時建好的；不用 paper-size-option 的點擊行為，只借它的外觀) */
+  function textOf(i){var L=[];L.push("程式："+i.app+"  "+i.v+"  （"+({app:"桌面App",web:"瀏覽器",file:"檔案"}[i.mode]||i.mode)+"）");
+    L.push("型號："+(i.model||"(讀不到)")+(i.platform?"  "+i.platform+" "+(i.platformVersion||""):""));
+    L.push("實體解析度："+i.physical.w+" × "+i.physical.h);L.push("像素倍率："+i.dpr);
+    L.push("螢幕尺寸："+i.screen.w+" × "+i.screen.h+"（可用 "+i.screen.availW+" × "+i.screen.availH+"）");
+    L.push("實際可用畫面："+i.viewport.docW+" × "+i.viewport.h);
+    L.push("安全距離：上"+i.safeArea.t+" 下"+i.safeArea.b+" 左"+i.safeArea.l+" 右"+i.safeArea.r);
+    L.push("方向："+i.orientation+"　縮放："+(i.uiScale||"-"));
+    if(i.layout){L.push("格子："+(i.layout.cellW||"-")+" × "+(i.layout.cellH||"-")+"　號碼字："+(i.layout.fontPx||"-")+"px");L.push("排版檢查："+(i.layout.problems.length?i.layout.problems.join("、"):"正常"))}else L.push("排版檢查：請回首頁再看");
+    return L.join("\n")}
+  function showPanel(){collect().then(function(i){
+    var ov=document.getElementById("screen-info-overlay");if(ov)ov.remove();ov=document.createElement("div");ov.id="screen-info-overlay";
+    ov.style.cssText="position:fixed;inset:0;z-index:99995;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;";
+    ov.innerHTML='<div style="background:#fff;color:#000;border-radius:12px;padding:16px;max-width:94vw;width:380px;box-sizing:border-box;box-shadow:0 8px 30px rgba(0,0,0,.35);"><div style="font-size:20px;font-weight:800;margin-bottom:10px;text-align:center;">螢幕資訊</div><pre id="screen-info-text" style="white-space:pre-wrap;word-break:break-all;font-size:14px;line-height:1.5;margin:0 0 12px;font-family:inherit;"></pre><div id="screen-info-status" style="font-size:14px;min-height:20px;margin-bottom:10px;text-align:center;"></div><div style="display:flex;gap:10px;"><button type="button" id="screen-info-send" style="flex:1;font-size:18px;font-weight:700;padding:10px 0;border-radius:8px;border:none;background:#FFD700;color:#000;">立即回傳</button><button type="button" id="screen-info-close" style="flex:1;font-size:18px;font-weight:700;padding:10px 0;border-radius:8px;border:none;background:#8a8a8a;color:#fff;">關閉</button></div></div>';
+    document.body.appendChild(ov);ov.querySelector("#screen-info-text").textContent=textOf(i);
+    ov.addEventListener("click",function(e){if(e.target===ov)ov.remove()});
+    ov.querySelector("#screen-info-close").addEventListener("click",function(){ov.remove()});
+    ov.querySelector("#screen-info-send").addEventListener("click",function(){var st=ov.querySelector("#screen-info-status");st.textContent="回傳中…";ping(true).catch(function(){});send(true).then(function(r){st.textContent=r&&r.ok?"已回傳 ✓":("回傳失敗："+(r&&(r.status?("代碼 "+r.status+" "+(r.body||"")):r.error)||"未知"))})})})}
+  var tries=0;(function attach(){var menu=document.getElementById("paper-size-menu");if(!menu){if(tries++<40)setTimeout(attach,500);return}
+    if(menu.querySelector(".screen-info-option"))return;
+    var b=document.createElement("button");b.type="button";b.className="paper-size-option screen-info-option";b.textContent="螢幕資訊";b.style.marginTop="10px";
+    b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();showPanel()});
+    var ver=Array.prototype.slice.call(menu.querySelectorAll(".paper-size-menu-title")).find(function(t){return /版本/.test(t.textContent)});
+    if(ver)menu.insertBefore(b,ver);else menu.appendChild(b)})();
 })();
 </script>
 </body>
