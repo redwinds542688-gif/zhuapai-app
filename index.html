@@ -2,9 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 19:35";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-24 20:13";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-09-24 20:13  三層：標定號碼的閃爍由「框閃爍」改成「號碼閃爍」(框固定顯示，號碼每 0.5 秒亮暗切換)。
+   2026-09-24 19:47  三層：一、二、三區所有標定號碼(定點格)的外框都閃爍(原本只有主動標定的那格閃)。
+   2026-09-24 19:45  修正 Google 預覽開獎單號碼被縮兩次(90%×90%＝81%)：號碼保護改成等開獎單畫出來才量，並用 CSS 規則把號碼固定在 90%。
+   2026-09-24 19:42  Google 預覽：文字(按鍵、標題等)與開獎單號碼都改為原本的 90%(文字＝抵銷手機放大後縮到 90%；號碼 --num-scale 0.90)。iPhone、Android 不動。
    2026-09-24 19:35  Google 預覽的開獎單號碼由 80% 改為 85%(只改 Google 預覽；iPhone 維持 70%、Android 不變)。
    2026-09-24 19:32  Google 預覽的開獎單號碼由 70% 改為 80%(只改 Google 預覽；iPhone 維持 70%、Android 不變)。
    2026-09-24 19:27  Google 預覽裡，選單最下面的版本旁邊顯示字型放大量測結果(例：預覽字 1.3→1(98%))，方便確認抵銷是否成功；其他裝置不顯示。
@@ -1830,8 +1834,10 @@ body.zp-sanceng #connect-svg{ display:none !important; }/* 2026-09-22 三層第�
 /* 2026-09-24 18:49 使用者指示「一二區相同號碼：字色換底色、底色換字色」：第一、二區第6期的共同號碼(zp-sc-common6)仍是滿格，但把標記字色與標記底色對調，跟其他滿格標記一眼分得出來；外框不變。存圖時底色由格子背景、字色由格子實際字色畫出，會一起反映 */
 table.road td.num.num-marked.num-marked-drag.zp-sc-common6, table.road td.num.num-marked.num-marked-drag.zp-sc-cross6{ background:var(--mark-text-color, #000) !important; color:var(--mark-bg-color, #FF3B3B) !important; }
 /* 2026-09-24 19:07 三層：主動標定號碼(zp-sc-active-blink)外框閃爍——亮時框加粗(3px 框色)，暗時框線全部拿掉；每 0.5 秒切換一次(body.zp-blink-off，由下方計時器控制，只在三層開著時跑)。用切 class 而不用 CSS 動畫，是因為標記格的框線規則都有 !important，動畫蓋不過去。存圖(capturing-*)時一律顯示框 */
-body.zp-sanceng table.road td.num.zp-sc-key.zp-sc-active-blink{ box-shadow:inset 0 0 0 3px var(--mark-frame-color, #2ECC71) !important; }
-body.zp-sanceng.zp-blink-off:not(.capturing-plain):not(.capturing-save-only):not(.capturing-clean-sheet) table.road td.num.zp-sc-key.zp-sc-active-blink{ box-shadow:none !important; outline-color:transparent !important; }
+/* 2026-09-24 19:47 使用者指示「在三層裡一二三區標定號碼外框閃爍」：閃爍範圍從「只有主動標定的那格」擴大到三區所有的標定號碼(定點格 zp-sc-key) */
+body.zp-sanceng table.road td.num.zp-sc-key.zp-sc-key.zp-sc-key{ box-shadow:inset 0 0 0 3px var(--mark-frame-color, #2ECC71) !important; }
+/* 2026-09-24 20:13 使用者指示「三層原本是框閃爍，改成號碼閃爍」：框固定顯示(3px 框色)，改成號碼本身閃——暗的時候號碼字變透明(底色、框都不動)。存圖時一律顯示號碼 */
+body.zp-sanceng.zp-blink-off:not(.capturing-plain):not(.capturing-save-only):not(.capturing-clean-sheet) table.road td.num.zp-sc-key.zp-sc-key.zp-sc-key, body.zp-sanceng.zp-blink-off:not(.capturing-plain):not(.capturing-save-only):not(.capturing-clean-sheet) table.road td.num.zp-sc-key.zp-sc-key.zp-sc-key *{ color:transparent !important; -webkit-text-fill-color:transparent !important; text-shadow:none !important; }
 body.zp-sanceng table.road td.num.zp-sc-key{ box-shadow:inset 0 0 0 1.6px var(--mark-frame-color, #2ECC71) !important; }
 /* 2026-09-22 使用者指示：08(起始標的)用一般配色的定點方框(zp-sc-key，上面那條)；搜尋邏輯找出的號碼要顯示相反色，
    跟c-mode-cha-echo-cell同一套反轉配色(框色當底、底色當框)，一眼分得出哪個是標的、哪個是搜尋結果 */
@@ -1855,7 +1861,7 @@ body.zhuapai-mode #data-blank-divider-line{ display:none !important; } /* 2026-0
 :root{ --num-scale:1; }  /* Android／電腦：維持原本大小 */
 /* 2026-09-24 14:51 使用者指示「只有開獎單裡的號碼太大，其他不太會；只是蘋果手機的微調，安卓不用改」：只縮開獎單(首頁四欄開獎單、全頁)；定期／C式／抓牌三層段落(recent-only-mode)維持原本大小。 */
 html.is-ios{ --num-scale:0.70; }
-html.is-preview{ --num-scale:0.85; }  /* 2026-09-24 19:35 使用者指示「Google 預覽原 80% 改為 85%，只改 Google 預覽」 */  /* 2026-09-24 19:32 使用者指示「Google 預覽原 70% 改為 80%，只改 Google 預覽」(iPhone 維持 0.70) */  /* 2026-09-24 19:27 Google 預覽(Android WebView)比照蘋果 */  /* 2026-09-24 19:02 使用者指示「蘋果 80% 改 70%」 */  /* 2026-09-24 15:07 使用者指示「改成 80%，號碼要在格子置中」(原 0.85) */  /* 2026-09-24 14:48 使用者指示「縮小 85% 應該只針對蘋果手機，安卓不用」 */
+html.is-preview{ --num-scale:0.90; }  /* 2026-09-24 19:42 使用者指示「Google 預覽文字、開獎單號碼從原本改為 90%；蘋果、安卓不動」 */  /* 2026-09-24 19:35 使用者指示「Google 預覽原 80% 改為 85%，只改 Google 預覽」 */  /* 2026-09-24 19:32 使用者指示「Google 預覽原 70% 改為 80%，只改 Google 預覽」(iPhone 維持 0.70) */  /* 2026-09-24 19:27 Google 預覽(Android WebView)比照蘋果 */  /* 2026-09-24 19:02 使用者指示「蘋果 80% 改 70%」 */  /* 2026-09-24 15:07 使用者指示「改成 80%，號碼要在格子置中」(原 0.85) */  /* 2026-09-24 14:48 使用者指示「縮小 85% 應該只針對蘋果手機，安卓不用」 */
 body:not(.capturing-plain):not(.capturing-save-only):not(.capturing-clean-sheet):not(.recent-only-mode) table.road td.num{ font-size:calc(15.802px * var(--num-scale)); }
 body:not(.capturing-plain):not(.capturing-save-only):not(.capturing-clean-sheet):not(.recent-only-mode).game-wide table.road td.num{ font-size:calc(17.558px * var(--num-scale)); }
 </style>
@@ -4927,21 +4933,26 @@ boot().catch(function(e){console.error("boot失敗",e)});
   function ratio(){try{var btn=document.querySelector("#game-tabs button");if(btn){var ui=parseFloat(getComputedStyle(R).getPropertyValue("--ui-scale"))||1;var act=parseFloat(getComputedStyle(btn).fontSize);if(act>0)return act/(26*ui)}}catch(e){}
     var d=document.createElement("div");d.style.cssText="position:absolute;left:0;top:0;width:360px;visibility:hidden;pointer-events:none;font:20px Arial,sans-serif";d.textContent=new Array(40).join("預覽字型大小量測 ");document.body.appendChild(d);var f=parseFloat(getComputedStyle(d).fontSize)/20;d.remove();return f||1}
   function setAdj(v){R.style.setProperty("-webkit-text-size-adjust",v);R.style.setProperty("text-size-adjust",v);if(document.body){document.body.style.setProperty("-webkit-text-size-adjust",v);document.body.style.setProperty("text-size-adjust",v)}}
-  function fix(){var f0=ratio();var log={before:+f0.toFixed(3)};if(Math.abs(f0-1)<0.03){log.action="不需調整";window.__previewTextFix=log;return}
+  /* 2026-09-24 19:42 文字目標改成原本的 90%(TEXT_TARGET)：抵銷手機放大後再縮到 90%；挑最接近 90% 的做法 */
+  var TEXT_TARGET=0.90;
+  function guardNums(textV,tries){try{var numTd=document.querySelector("table.road td.num");if(!numTd||!(numTd.getBoundingClientRect().width>0)){if(tries<40)setTimeout(function(){guardNums(textV,tries+1)},500);return}
+    var ro=document.body.classList.contains("recent-only-mode");if(ro||document.body.classList.contains("pinch-fullscreen-mode")){if(tries<40)setTimeout(function(){guardNums(textV,tries+1)},500);return}
+    var expect=function(){var ns=parseFloat(getComputedStyle(R).getPropertyValue("--num-scale"))||1;return(document.body.classList.contains("game-wide")?17.558:15.802)*ns};
+    var nr=function(){return parseFloat(getComputedStyle(numTd).fontSize)/expect()};var st=document.getElementById("pv-num-guard");if(!st){st=document.createElement("style");st.id="pv-num-guard";document.head.appendChild(st)}
+    var setT=function(v){st.textContent=v?"html.is-preview table.road{-webkit-text-size-adjust:"+v+" !important;text-size-adjust:"+v+" !important}":""};
+    setT("");var n0=nr();var log=window.__previewTextFix||{};log.num=+n0.toFixed(3);
+    if(Math.abs(n0-1)>0.03){var nb={v:"",f:n0};["100%","none",textV,(100/n0).toFixed(1)+"%"].forEach(function(v){if(!v)return;setT(v);var f=nr();if(Math.abs(f-1)<Math.abs(nb.f-1))nb={v:v,f:f}});setT(nb.v);log.numFix=nb.v||"(不變)";log.numAfter=+nb.f.toFixed(3)}
+    window.__previewTextFix=log}catch(e){}}
+  function fix(){var f0=ratio();var log={before:+f0.toFixed(3)};if(Math.abs(f0-TEXT_TARGET)<0.02){log.action="不需調整";window.__previewTextFix=log;return}
     var best={v:"100%",f:f0};
-    setAdj("none");var f1=ratio();log.none=+f1.toFixed(3);if(Math.abs(f1-1)<Math.abs(best.f-1))best={v:"none",f:f1};
-    var pct=(100/f0).toFixed(1)+"%";setAdj(pct);var f2=ratio();log[pct]=+f2.toFixed(3);if(Math.abs(f2-1)<Math.abs(best.f-1))best={v:pct,f:f2};
+    setAdj("none");var f1=ratio();log.none=+f1.toFixed(3);if(Math.abs(f1-TEXT_TARGET)<Math.abs(best.f-TEXT_TARGET))best={v:"none",f:f1};
+    var pct=(TEXT_TARGET*100/f0).toFixed(1)+"%";setAdj(pct);var f2=ratio();log[pct]=+f2.toFixed(3);if(Math.abs(f2-TEXT_TARGET)<Math.abs(best.f-TEXT_TARGET))best={v:pct,f:f2};
     setAdj(best.v);log.action="text-size-adjust:"+best.v;log.after=+best.f.toFixed(3);
-    /* 2026-09-24 19:27 開獎單號碼保護：字型抵銷會作用在整頁，若手機原本沒有放大開獎單號碼，抵銷後號碼會小於 70%。這裡量首頁開獎單號碼(應有＝原字級×--num-scale)，偏差超過 3% 就對開獎單另外試「100%／none／抵銷值」挑最接近的，讓號碼維持跟 iPhone 一樣的 70% */
-    try{var numTd=document.querySelector("table.road td.num");var tbls=document.querySelectorAll("table.road");if(numTd&&tbls.length){
-      var expect=function(){var ns=parseFloat(getComputedStyle(R).getPropertyValue("--num-scale"))||1;var wide=document.body.classList.contains("game-wide");var ro=document.body.classList.contains("recent-only-mode");return ro?(wide?13.506:12.155):(wide?17.558:15.802)*ns};
-      var nr=function(){return parseFloat(getComputedStyle(numTd).fontSize)/expect()};var n0=nr();log.num=+n0.toFixed(3);
-      if(Math.abs(n0-1)>0.03){var setT=function(v){tbls.forEach(function(t){t.style.setProperty("-webkit-text-size-adjust",v);t.style.setProperty("text-size-adjust",v)})};
-        var nb={v:"",f:n0};["100%","none",best.v].forEach(function(v){setT(v);var f=nr();if(Math.abs(f-1)<Math.abs(nb.f-1))nb={v:v,f:f}});setT(nb.v);log.numFix=nb.v||"(不變)";log.numAfter=+nb.f.toFixed(3)}}}catch(e){}
-    window.__previewTextFix=log;
+    /* 2026-09-24 19:45 開獎單號碼保護(改寫)：原本在頁面剛載入時就量，那時開獎單還沒畫出來所以量不到；改成另外的 guardNums()，等開獎單出現才量，修正值寫成 CSS 規則(不是寫在個別表格上)，換彩種重畫表格也有效。目標＝號碼字級剛好等於 原字級×--num-scale(Google 預覽 90%) */
+    window.__previewTextFix=log;setTimeout(function(){guardNums(best.v,0)},0);
     try{window.dispatchEvent(new Event("resize"))}catch(e){}}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fix);else fix();
-  try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!window.__previewTextFix||window.__previewTextFix.action==="不需調整")fix()})}catch(e){}
+  try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!window.__previewTextFix)fix()})}catch(e){}
 }catch(e){}})();</script>
 </body>
 </html>
