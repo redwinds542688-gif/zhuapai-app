@@ -2,9 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-25 09:55";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-09-25 11:35";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-09-25 11:35  修安裝提示的「安裝」字超出按鍵：按鍵文字最大化時，非置中排版的按鍵改成置中(字以按鍵中心往兩邊放大)。
    2026-09-25 09:55  全自動適配：①開獎單號碼大小自動算(內建字體＝安卓 100%，換成替代字體會自動補正；蘋果 80%、Google 預覽 90%)；②首頁/全頁開獎單格線改由程式畫，所有手機統一畫面 0.52px(安卓與蘋果的中間)，取代只給蘋果的格線補丁。
    2026-09-25 09:35  螢幕資訊回傳改成「一安裝馬上回傳」：安卓按安裝完成(appinstalled)、蘋果從主畫面圖示第一次打開時立刻回傳一筆；選單裡的「螢幕資訊」按鍵拿掉。
    2026-09-25 09:34  加入「螢幕資訊回傳」(從主程式移植)：每支手機第一次打開(及尺寸/版本改變時)自動把螢幕尺寸、像素倍率、可用畫面、安全距離、型號、排版檢查送到 Worker(/report)；每天第一次打開送使用紀錄(/ping)；設定選單新增「螢幕資訊」可查看並立即回傳。
@@ -5090,7 +5091,7 @@ window.__drawNums15=function(canvas,scale){try{const ctx=canvas.getContext("2d")
     b.dataset.fitPrep="1";b.dataset.fitW=String(r.width);b.dataset.fitH=String(r.height);const dyn=!!(b.style.height||b.style.width);/* 大小由其他程式動態設定的按鍵(底部浮動鍵)不固定尺寸，只調字 */
     b.style.setProperty("box-sizing","border-box","important");if(!dyn)b.style.setProperty("height",(r.height/sy).toFixed(2)+"px","important");
     b.style.setProperty("padding-top","0","important");b.style.setProperty("padding-bottom","0","important");
-    b.style.setProperty("align-items","center","important");b.style.setProperty("justify-content","center","important");b.style.setProperty("overflow","visible","important");
+    const disp=getComputedStyle(b).display;if(disp==="block")b.style.setProperty("display","flex","important");else if(disp==="inline-block"||disp==="inline")b.style.setProperty("display","inline-flex","important");/* 不是 flex 的按鍵(例：安裝提示的「安裝」鍵)字會從左邊開始排，放大後往右超出；改成 flex 置中，字以按鍵中心往兩邊擴展，留在按鍵框裡 */b.style.setProperty("text-align","center","important");b.style.setProperty("align-items","center","important");b.style.setProperty("justify-content","center","important");b.style.setProperty("overflow","visible","important");
     const r2=b.getBoundingClientRect();if(!dyn&&Math.abs(r2.width-r.width)>0.5)b.style.setProperty("width",(r.width/sx).toFixed(2)+"px","important")}
   let q=0,obs=null;
   function run(){q=0;try{const list=[...document.querySelectorAll(SEL)];list.forEach(prep);list.forEach(b=>fit(b,0));list.forEach(b=>fit(b,1))}catch(e){}if(obs)obs.takeRecords()}
