@@ -1,33 +1,71 @@
-/* 抓539 離線背景程式(service worker)——iPhone、Android 共用
-   策略：index.html 用「網路優先、離線才用快取」(有網路時一定拿到最新版程式，不會卡在舊版)；
-   manifest／圖示用「快取優先」；跨網域請求(Cloudflare Worker 的開獎資料等)一律不攔、不快取。
-   要強制所有手機更新快取時，把下面 CACHE 的版本字串改掉即可。 */
-const CACHE = "zhua539-v2"; /* v2：換成使用者提供的「抓539」圖示 */
-const SHELL = ["./", "./index.html", "./manifest.json",
-  "./icon-192.png", "./icon-512.png", "./icon-192-maskable.png", "./icon-512-maskable.png", "./apple-touch-icon.png"];
+/* 抓539 離線背景程式(service worker)
+   2026-09-30 19:48 使用者回報「已經上傳新版，舊版卻沒有更新提示」而改寫：
+   ・網頁(index.html)與版本檢查一律「先上網抓最新」，抓不到(沒網路)才用手機裡存的，不會再因為快取拿到舊版而收不到更新提示。
+   ・版本檢查只讀檔案開頭(Range)，這種請求直接上網，不存進快取。
+   ・圖示、manifest.json 等其他檔案：先用手機裡的(開得快)，同時在背景更新。
+   ・換上新版 sw.js 後立刻接管所有畫面(skipWaiting + clients.claim)，並刪掉舊版快取。
+   以後修改這個檔案時把 CACHE 的版本號加 1。 */
+const CACHE = "zhua539-v3";
+const CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(
+    caches.open(CACHE).then(function (c) {
+      /* 逐一存，某個檔案不存在(例如沒有上傳圖示)也不會讓整個安裝失敗 */
+      return Promise.all(CORE.map(function (u) {
+        return fetch(u, { cache: "no-store" }).then(function (r) { if (r.ok) return c.put(u, r); }).catch(function () {});
+      }));
+    }).then(function () { return self.skipWaiting(); })
+  );
 });
+
 self.addEventListener("activate", function (e) {
-  e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
-  }).then(function () { return self.clients.claim(); }));
+  e.waitUntil(
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+    }).then(function () { return self.clients.claim(); })
+  );
 });
+
+function isPage(req) {
+  if (req.mode === "navigate") return true;
+  const u = new URL(req.url);
+  return u.origin === location.origin && (/\/$/.test(u.pathname) || /\.html?$/.test(u.pathname));
+}
+
 self.addEventListener("fetch", function (e) {
   const req = e.request;
   if (req.method !== "GET") return;
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return; /* 跨網域(雲端資料)不攔 */
-  const isShellPage = req.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("/index.html");
-  if (isShellPage) {
-    e.respondWith(fetch(req).then(function (res) {
-      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(function (c) { c.put("./index.html", copy); }); }
-      return res;
-    }).catch(function () { return caches.match("./index.html").then(function (r) { return r || caches.match("./"); }); }));
+  const u = new URL(req.url);
+  if (u.origin !== location.origin) return; /* 雲端資料等外部網址不經過這裡 */
+
+  /* 版本檢查(只讀開頭幾 KB，或網址帶 _v= / u=)：直接上網，不用也不存快取 */
+  if (req.headers.has("range") || u.searchParams.has("_v") || u.searchParams.has("u")) {
+    e.respondWith(fetch(req, { cache: "no-store" }).catch(function () { return caches.match(req, { ignoreSearch: true }); }));
     return;
   }
-  e.respondWith(caches.match(req).then(function (r) { return r || fetch(req).then(function (res) {
-    if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
-    return res; }); }));
+
+  /* 網頁：先上網抓最新，成功就順便更新手機裡的；沒網路才用手機裡的 */
+  if (isPage(req)) {
+    e.respondWith(
+      fetch(req, { cache: "no-store" }).then(function (r) {
+        if (r && r.ok) { const copy = r.clone(); caches.open(CACHE).then(function (c) { c.put("./index.html", copy); }); }
+        return r;
+      }).catch(function () {
+        return caches.match(req, { ignoreSearch: true }).then(function (m) { return m || caches.match("./index.html"); });
+      })
+    );
+    return;
+  }
+
+  /* 其他檔案(圖示、manifest.json)：先用手機裡的，同時在背景更新 */
+  e.respondWith(
+    caches.match(req).then(function (m) {
+      const net = fetch(req).then(function (r) {
+        if (r && r.ok) { const copy = r.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
+        return r;
+      }).catch(function () { return m; });
+      return m || net;
+    })
+  );
 });
