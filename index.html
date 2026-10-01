@@ -42,7 +42,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-01 17:22";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-01 19:13";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -90,7 +90,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
  位置：
   ・單桿範圍畫面第 1～18 期，初始第 18 期；紅色桿頭(紅底#e02020、藍箭頭#1E63D0、白框)拖曳換期。
   ・對照期固定是畫面第 16、17、18 期(不隨單桿移動)。畫面第 19 列＝空白第一期的位置。
- 九宮差：SB_OFFS＝-11、-10、-9、-1、0、+1、+9、+10、+11；號碼加減後超出範圍繞回(539/天天樂 1～39、六合彩/大樂透 1～49)。
+ 九宮差：SB_OFFS＝-11、-10、-9、-1、0、+1、+9、+10、+11(九宮模式)；長按註記模式改用十字差 0、+10、-10、+1、-1(2026-10-01 19:13 使用者指示「註記亮燈，藍色鍵切換的是十字差」，藍底欄位單擊依此順序換下一個成立的)；九宮模式的基礎號(九宮拖牌統計)一律用 9 個九宮差。號碼加減後超出範圍繞回(539/天天樂 1～39、六合彩/大樂透 1～49)。
  基礎號：
   ・長按註記模式：桿上號碼(5 或 6 個，不含特別號)。
   ・九宮模式：桿上號碼做九宮拖牌(9 個差)＝統計1，做 414 拖牌(-14、-4、+4、+14)＝統計2；兩個統計都大於 0 的號碼次數相加，相加 ≥3 的號碼＝基礎號(calcBase)。
@@ -98,7 +98,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   ①第 16 期不可中任何目標號碼；②第 17、18 期都至少中 1 個，而且兩期能各挑一個「不同」的號碼；③扣掉 17/18 期開過的號碼後至少剩 1 個。
   ★2026-10-01 15:05 使用者指示取消①②：現在長按註記/九宮(isValidOrig)＝有目標號碼就成立；舊函式 isValid 只留③。預測號照舊＝目標號碼扣掉第 17/18 期開過的。
     單桿開著時從標定號碼上開始滑也可以捲動(格子上的標定是尋號結果，不是第三招)。
-  從 -11 開始找第一個成立的；藍底九宮差欄位(單桿下一列的日期＋星期欄，藍底#1E63D0 紅字#e02020，字最大化)顯示目前九宮差，
+  從 -11(長按註記模式從十字差 0)開始找第一個成立的；藍底九宮差欄位(單桿下一列的日期＋星期欄，藍底#1E63D0 紅字#e02020，字最大化)顯示目前九宮差，
   單擊欄位＝換下一個成立的九宮差；同一桿成立不只一個時欄位字閃爍。都不成立＝「無」。九宮模式停在「無」的期會自動跳到最近有成立的期。
  18 期標定：目前九宮差的目標號碼，畫面 18 期裡同號全部標定。
  空白期(畫面第 19 列)：
@@ -215,6 +215,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-01 19:13  單桿長按註記(註記亮燈)：藍底欄位切換的改成十字差 0→+10→-10→+1→-1(使用者指示「註記亮燈藍色鍵切換的是十字差，不是九宮差；九宮亮燈切換的才是九宮差」)；九宮模式照舊九宮差。
    2026-10-01 17:22  天天樂內建資料補上缺的 2 期：2026-08-19(三) 05 15 31 38 39、2026-08-21(五) 10 30 31 34 35（依使用者提供的外部落球表；同表其他期數與內建資料逐一比對一致）。天天樂 2025-12-17～2026-10-01 不再有缺期
    2026-10-01 17:21  更正版本時間規則(使用者提醒「現在時間是 15:42」)：今天的版本號 17:00、17:20 都超前實際時間；改成一律用台灣實際時間、且必須大於上一版，這一版因此標 2026-10-01 17:21(實際 2026-10-01 15:43)，17:20 之後就恢復用實際時間。程式功能無變動。
    2026-10-01 17:20  專案搬家寫進規格書(使用者指示)：程式碼改放 GitHub redwinds542688-gif/539-app(私人)，65 個 commit、15 個分支全部搬過去；舊的 redwinds542688/539-backend 帳號已無法登入不再使用。程式功能無變動。
@@ -5089,7 +5090,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     {const svg=h.querySelector("svg");if(svg){const a=Math.max(14,Math.min(28,hh*0.72));svg.setAttribute("width",a.toFixed(1));svg.setAttribute("height",a.toFixed(1))}}
     h.style.display="flex";{dataRows();const sc=SB.screen||[];const i=sc.indexOf(tr);placeTag(i>=0&&sc[i+1]?sc[i+1]:null)/* 單桿在第 18 期時，九宮差欄位在第 19 列 */}}
   /* ---- 尋號：桿位號碼逐號 + 九宮差 → 18 期內同號全部標定 ---- */
-  const SB_OFFS=[-11,-10,-9,-1,0,1,9,10,11];const SB_STEP_MS=0;/* 2026-09-25 23:03 使用者指示「搜尋標定號碼顯示太慢，感覺一顆一顆顯示」：原本每號 0.3 秒，改成 0＝一次全部標定 */
+  const SB_OFFS_NINE=[-11,-10,-9,-1,0,1,9,10,11];const SB_OFFS_CROSS=[0,10,-10,1,-1];let SB_OFFS=SB_OFFS_NINE;/* 2026-10-01 19:13 使用者指示「註記亮燈，藍色鍵切換的是十字差，不是九宮差；九宮亮燈切換的才是九宮差」：長按註記(orig)用十字差 0→+10→-10→+1→-1，九宮(three)照舊九宮差；進入單桿時依模式切換(見 start) */const SB_STEP_MS=0;/* 2026-09-25 23:03 使用者指示「搜尋標定號碼顯示太慢，感覺一顆一顆顯示」：原本每號 0.3 秒，改成 0＝一次全部標定 */
   function offLabel(o){return(o>0?"+":"")+o}
   function wrapNum(n,off,max){let z=n+off;if(off<0){if(z<=0)z=max+z}else if(off>0){if(z>max)z=z-max}return z}
   function cellsOf(tr){return Array.prototype.slice.call(tr.querySelectorAll("td.num")).slice(0,cModeColCount())}
@@ -5144,7 +5145,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
      之後照原算法：基礎號加九宮差(-11 起逐一)＝目標號碼；第 16 期不中、17/18 期都中且中不同號＝成立(2026-10-01 15:05 這個限制已取消：有目標號碼就成立)；成立的九宮差中 17/18 期沒中的目標號碼＝預測號(按註記/長按九宮回溯記進註記欄) */
   function baseNums(){return SB.mode==="three"?(SB.base||[]):barNumsNow()}
   function calcBase(){const max=(typeof cModeMaxBall==="function")?cModeMaxBall():39;const bn=barNumsNow();const c1={},c2={};
-    bn.forEach(function(n){SB_OFFS.forEach(function(o){const t=wrapNum(n,o,max);c1[t]=(c1[t]||0)+1});[-14,-4,4,14].forEach(function(o){const t=wrapNum(n,o,max);c2[t]=(c2[t]||0)+1})});
+    bn.forEach(function(n){SB_OFFS_NINE.forEach(function(o){const t=wrapNum(n,o,max);c1[t]=(c1[t]||0)+1});[-14,-4,4,14].forEach(function(o){const t=wrapNum(n,o,max);c2[t]=(c2[t]||0)+1})});
     const sum={};Object.keys(c1).forEach(function(k){if(c2[k]>0)sum[k]=c1[k]+c2[k]});
     const lv=[];Object.keys(sum).map(function(k){return sum[k]}).sort(function(a,b){return b-a}).forEach(function(c){if(lv.indexOf(c)<0)lv.push(c)});
     const cols=(typeof cModeColCount==="function")?cModeColCount():5;const nums=Object.keys(sum).map(Number);
@@ -5234,7 +5235,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     if(!hit[0].length||!hit[1].length)return false;
     return hit[0].some(function(a){return hit[1].some(function(b){return a!==b})})}
   function runSearch(from){if(!SB.on)return;if(SB.mode==="three")calcBase();if(SB.mode==="orig"||SB.mode==="three"){cancelRun();SB.stats=notesStats();if(SB.mode==="three"&&SB.notes&&!Object.keys(SB.notes.cnt).length&&SB.sum){const sm=SB.sum.sum;SB.stats={cnt:sm,noCount:true/* 2026-09-29 使用者指示前二名號碼右上角的相加次數取消 */,list:(SB.base||[]).map(function(v){return {v:v,c:sm[v]}})}}/* 2026-09-29 使用者指示「先把進入九宮找到的前二名列在註記欄位我看看」：還沒按註記前，註記欄列出前二名(基礎號)，右上角＝九宮＋414 相加次數；按過註記/回溯後改顯示累加的預測號 */try{renderStats()}catch(e){}let oi=-1;const st=(typeof from==="number"&&from>=0)?from:0;SB.validCount=0;for(let k=0;k<SB_OFFS.length;k++)if(isValidOrig(k))SB.validCount++;for(let k=0;k<SB_OFFS.length;k++){const i=(st+k)%SB_OFFS.length;if(isValidOrig(i)){oi=i;break}}SB.lastShow=showOffset(oi)||[];if(SB.mode==="three"&&SB.notes&&!Object.keys(SB.notes.cnt).length){/* 2026-09-30 19:11 使用者指示「註記亮燈，註記欄不再顯示所有預測號」：長按註記(原算法版)不再列出目前九宮差的全部預測號，註記欄只顯示按註記/長按註記回溯累加的結果(還沒累加前是空的)；九宮模式照舊 *//* 2026-09-29 使用者指示長按註記(原算法版)也一樣：註記欄顯示所有預測號，有開的另外標記 */const __tg=oi<0?[]:targetsFor(oi).filter(function(v,i,a){return a.indexOf(v)===i}).sort(function(a,b){return a-b});SB.stats={cnt:{},noCount:true,list:__tg.map(function(v){return {v:v,c:1,hit:SB.lastShow.indexOf(v)<0}})};try{renderStats()}catch(e){}}/* 2026-09-29 使用者指示「註記欄顯示所有預測號，有開的另外標示就好；空白期顯示沒開出的號碼，最多五號」：註記欄＝目前九宮差的全部目標號碼(由小到大)，第 17/18 期已開出的加 zp-sb-hitnum 另外標示(粉紅底) *//* 2026-09-29 使用者指示「要 -10 就顯示 -10 後的號碼，註記欄顯示 17、18 沒中的號碼，空白期也一樣」：九宮模式註記欄(還沒回溯累加前)＝目前九宮差的預測號，切換九宮差跟著換 */if(typeof logEvent==="function")try{logEvent("單桿原算法","第 "+SB.period+" 期 → "+(oi<0?"無":offLabel(SB_OFFS[oi])))}catch(e){}return}cancelRun();clearHits();const max=(typeof cModeMaxBall==="function")?cModeMaxBall():39;const g=grid();const barNums=barNumsNow();
-    const cnt={};barNums.forEach(function(n){SB_OFFS.forEach(function(o){const t=wrapNum(n,o,max);cnt[t]=(cnt[t]||0)+1})});
+    const cnt={};barNums.forEach(function(n){SB_OFFS_NINE.forEach(function(o){const t=wrapNum(n,o,max);cnt[t]=(cnt[t]||0)+1})});
     /* 2026-09-28 使用者指示「在這桿沒有 3 次的，顯示等於 2 次的給我看」：先找 ≥3；一個都沒有才改用 =2(標定、註記、空白期都照同樣方式顯示)；連 2 次都沒有才顯示「無」 *//* 2026-09-28 使用者指示「把長按九宮等於 2 的邏輯改在長按註記，長按九宮改回原邏輯」：SB.mode="three"(長按定顯進入)＝次數 ≥3 成立：18 期標定、註記欄、空白期放第一名；SB.mode="two"(長按註記進入)＝次數剛好等於 2 成立：18 期標定、註記欄，空白期不放 */const thr=(SB.mode==="two")?2:3;let res=Object.keys(cnt).map(Number).filter(function(v){return thr===2?cnt[v]===2:cnt[v]>=3});res.sort(function(a,b){return cnt[b]-cnt[a]||a-b});SB.thr=thr;
     SB.none=!res.length;SB.res=res;placeTagText();SB.stats=notesStats()||{cnt:{},list:[]};/* 2026-09-29 使用者指示取消「剛進入九宮時註記欄顯示九宮 ≥3 的號碼」：註記欄只顯示累加的預測號(一開始是空的) */try{renderStats()}catch(e){}
     /* 2026-09-28 使用者指示「2 次的才標註記欄，其他的不用」：用 =2 補上時只列在註記欄，不在 18 期標定、不填空白期 */if(res.length){g.forEach(function(row){row.forEach(function(cl){if(cl.v!==null&&res.indexOf(cl.v)>=0)markHit(cl.td)})});
@@ -5262,7 +5263,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
   window.__zpSbSkip=searchSkip;
   /* 2026-09-29 重建表格(轉向)前後保存/恢復單桿狀態 */
   window.__zpSbSnap=function(){if(!SB.on)return null;return {mode:SB.mode,period:SB.period,oi:SB.oi,notes:SB.notes?JSON.parse(JSON.stringify(SB.notes)):null,oa:SB.oa?Object.assign({},SB.oa,{running:false,paused:!SB.oa.done}):null}};
-  window.__zpSbRestore=function(s){if(!s||SB.on)return;if(!start(s.mode==="orig"?"orig":"three"))return;SB.notes=s.notes||{cnt:{},keys:{}};SB.oa=s.oa||null;SB.period=s.period||18;update(true);runSearch(s.oi||0);
+  window.__zpSbRestore=function(s){if(!s||SB.on)return;if(!start(s.mode==="orig"?"orig":"three"))return;SB.notes=s.notes||{cnt:{},keys:{}};SB.oa=s.oa||null;SB.period=s.period||18;update(true);runSearch((s.oi>0&&s.oi<SB_OFFS.length)?s.oi:0);/* 19:13：舊存檔的九宮差序號可能超出十字差(5 個)範圍 */
     [250,600,950].forEach(function(ms){setTimeout(function(){if(SB.on&&!SB.drag&&!(SB.oa&&SB.oa.running)&&SB.period!==s.period){SB.period=s.period;update(true);runSearch(s.oi||0)}},ms)})/* start() 自己的延遲重找可能把期數改回來，再套一次 */};
   function nextOffset(){runSearch((SB.oi+1)%SB_OFFS.length)}
   /* 拖曳鍵上方的小標籤：顯示目前的九宮差 */
@@ -5287,7 +5288,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
   (function(){let was=false,t=0;try{new MutationObserver(function(){const on=document.body.classList.contains("c-drag-scroll");if(on===was)return;was=on;if(!SB.on||(SB.mode!=="orig"&&SB.mode!=="three"))return;
     if(on){if(t){clearTimeout(t);t=0}SB.scrolling=true;cancelRun();try{clearHits()}catch(_){}try{uncover()}catch(_){}/* 2026-10-01 13:55 使用者回報「先清除重畫再移動」：第 19 列被預測號蓋住的格子也要先還原，否則它跟著表格往上移、留在別的期數(號碼被藏、只剩右上角小字) */unpaint()}
     else{if(t)clearTimeout(t);t=setTimeout(function(){t=0;SB.scrolling=false;if(!SB.on)return;SB.rowsDirty=true;SB.lastKey="";try{update(true)}catch(_){}try{if(typeof logEvent==="function")logEvent("單桿","捲動後重算 第 "+SB.period+" 期 "+((rowOf(SB.period)||{}).dataset||{}).date)}catch(_){}runSearch(0)},450)}}).observe(document.body,{attributes:true,attributeFilter:["class"]})}catch(e){}})();
-  function start(mode){if(SB.on)return false;const b=bc();if(!b.contains("zhuapai-mode")||b.contains("zp-sanceng"))return false;SB.mode=(mode==="orig")?"orig":"three";SB.startAt=Date.now();SB.notes={cnt:{},keys:{}};SB.oa=null;SB.oaTok=(SB.oaTok||0)+1;bc().toggle("zp-sb-orig",SB.mode==="orig");bc().toggle("zp-sb-three",SB.mode==="three");/* 2026-09-29 九宮模式：九宮鍵亮燈、其他熄燈 *//* 2026-09-29 原算法版：註記亮燈、其他鍵熄燈；註記統計每次進入都從空的開始 *//* 2026-09-28 使用者指示：長按「定顯」＝統計表 ≥3；長按「註記」＝原算法版(逐一九宮差) */
+  function start(mode){if(SB.on)return false;const b=bc();if(!b.contains("zhuapai-mode")||b.contains("zp-sanceng"))return false;SB.mode=(mode==="orig")?"orig":"three";SB_OFFS=(SB.mode==="orig")?SB_OFFS_CROSS:SB_OFFS_NINE;SB.oi=0;SB.startAt=Date.now();SB.notes={cnt:{},keys:{}};SB.oa=null;SB.oaTok=(SB.oaTok||0)+1;bc().toggle("zp-sb-orig",SB.mode==="orig");bc().toggle("zp-sb-three",SB.mode==="three");/* 2026-09-29 九宮模式：九宮鍵亮燈、其他熄燈 *//* 2026-09-29 原算法版：註記亮燈、其他鍵熄燈；註記統計每次進入都從空的開始 *//* 2026-09-28 使用者指示：長按「定顯」＝統計表 ≥3；長按「註記」＝原算法版(逐一九宮差) */
     try{if(typeof window.__zpR19Uncover==="function")window.__zpR19Uncover()}catch(e){}/* 先還原一般抓牌的第 19 列(單桿有自己的處理) */
     SB.stash={pickedPaths:pickedPaths,connections:connections,broadened:broadened,historyStack:historyStack};
     pickedPaths=[];connections=[];broadened=false;historyStack=[];
