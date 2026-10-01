@@ -42,7 +42,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-01 19:13";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-01 21:04";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -102,13 +102,14 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   單擊欄位＝換下一個成立的九宮差；同一桿成立不只一個時欄位字閃爍。都不成立＝「無」。九宮模式停在「無」的期會自動跳到最近有成立的期。
  18 期標定：目前九宮差的目標號碼，畫面 18 期裡同號全部標定。
  空白期(畫面第 19 列)：
-  ・目前九宮差的目標號碼中，第 17/18 期沒開出的，由小到大，最多 5 格(六合彩/大樂透 6 格)。兩種模式相同(09-30 19:06 撤回過 17/18 期九宮＋414 等於 0 的做法)。
+  ・目前九宮差(長按註記＝十字差)的全部目標號碼，由小到大，最多 5 格(六合彩/大樂透 6 格)；2026-10-01 20:55 起第 17/18 期開過的也照樣顯示(原本扣掉不顯示)。兩種模式相同(09-30 19:06 撤回過 17/18 期九宮＋414 等於 0 的做法)。
   ・第 19 列不論是否已開獎，一進單桿就整列蓋成空白期樣子；已開獎時右上角紅字(#FF3B3B，0.66em)標真實號碼，特別號格也一樣。
   ・預測號：藍字#0050D0、淺藍底#DCEBFF、1px 藍框(暗色系：字#7DB8FF、底#0D2B55)；筆畫離左格線、下格線＝格子大小 8%(至少 3px)(inkPlace)。
  註記欄：
   ・九宮模式：還沒累加前，列出目前九宮差的全部目標號碼(由小到大)，第 17/18 期開過的用粉紅底另外標示。
   ・長按註記模式：還沒累加前是空的(09-30 19:11)。
   ・累加後兩種模式都顯示累加結果＋右上次數，最多 18 個(次數少的不顯示)。
+ 長按註記模式長按藍底十字差按鍵(0.6 秒，2026-10-01 21:01)：註記欄改顯示「單桿 5 號 × 十字差 0/+10/-10/+1/-1」共 25 號的統計前二名(同次數並列，右上角＝次數；超過 18 顆就剔除最後一名(次數最低那一整批)再顯示，2026-10-01 21:04)，10 秒後恢復原本的註記欄；長按不切換十字差。
  累加：
   ・長按註記模式：單擊/雙擊「註記」＝把目前預測號(空白期那幾個)各 +1；同一期同一個九宮差只記一次。
   ・九宮模式：「註記」鍵單擊、雙擊、長按都沒有作用(09-29 18:09)，註記欄只由長按九宮回溯累加。
@@ -215,6 +216,9 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-01 21:04  單桿長按十字差按鍵的 25 號統計：前二名超過 18 顆就剔除最後一名(次數最低那一整批)再顯示(使用者指示)。
+   2026-10-01 21:01  單桿長按註記：長按藍底十字差按鍵＝註記欄顯示單桿 5 號 × 5 個十字差(25 號)統計前二名 10 秒，之後恢復原顯示(使用者指示)。
+   2026-10-01 20:55  單桿空白期：第 17/18 期開過的目標號碼也照樣顯示(使用者指示)，空白期＝目前九宮差/十字差的全部目標號碼。
    2026-10-01 19:13  單桿長按註記(註記亮燈)：藍底欄位切換的改成十字差 0→+10→-10→+1→-1(使用者指示「註記亮燈藍色鍵切換的是十字差，不是九宮差；九宮亮燈切換的才是九宮差」)；九宮模式照舊九宮差。
    2026-10-01 17:22  天天樂內建資料補上缺的 2 期：2026-08-19(三) 05 15 31 38 39、2026-08-21(五) 10 30 31 34 35（依使用者提供的外部落球表；同表其他期數與內建資料逐一比對一致）。天天樂 2025-12-17～2026-10-01 不再有缺期
    2026-10-01 17:21  更正版本時間規則(使用者提醒「現在時間是 15:42」)：今天的版本號 17:00、17:20 都超前實際時間；改成一律用台灣實際時間、且必須大於上一版，這一版因此標 2026-10-01 17:21(實際 2026-10-01 15:43)，17:20 之後就恢復用實際時間。程式功能無變動。
@@ -5268,7 +5272,13 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
   function nextOffset(){runSearch((SB.oi+1)%SB_OFFS.length)}
   /* 拖曳鍵上方的小標籤：顯示目前的九宮差 */
   /* 2026-09-25 22:49 使用者指示「九宮差顯示欄位是拖曳桿下面的日期星期欄位，藍底紅字，九宮差在欄位裡顯示最大化」：標籤蓋在單桿下一列的日期＋星期兩格(左到日期左邊格線、右到星期右邊格線)，藍底(#1E63D0)紅字(#e02020)，字級依格子大小最大化 */
-  function buildTag(){if(SB.tag)return SB.tag;const g=document.createElement("div");g.id="zp-sb-offset-tag";Object.assign(g.style,{position:"fixed",display:"none",alignItems:"center",justifyContent:"center",zIndex:"9601",background:"#1E63D0",color:"#e02020",border:"2px solid #fff",boxSizing:"border-box",boxShadow:"0 0 4px rgba(0,0,0,0.7)",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"});const sp=document.createElement("span");sp.className="zp-sb-offset-txt";Object.assign(sp.style,{font:"900 20px/1 Arial, Helvetica, sans-serif",color:"#e02020",display:"inline-block"});g.appendChild(sp);document.body.appendChild(g);SB.tag=g;/* 2026-09-28 使用者指示「切換換到單桿下面那個藍色底 -11 那裡做切換，如果該桿不只一個則 -11 閃爍提示」：原算法版中單擊這個欄位＝換到下一個成立的九宮差 */g.addEventListener("click",function(e){if(!SB.on||(SB.mode!=="orig"&&SB.mode!=="three")||SB.none||(SB.oa&&SB.oa.running))return;e.preventDefault();e.stopPropagation();const now=Date.now();if(now-(SB.tagTapAt||0)<300)return;SB.tagTapAt=now;nextOffset()});["pointerdown","touchstart"].forEach(function(ev){g.addEventListener(ev,function(e){if(SB.on&&(SB.mode==="orig"||SB.mode==="three"))e.stopPropagation()},{passive:true})});return g}
+  function crossTop2Show(){if(!SB.on||SB.mode!=="orig")return;const max=(typeof cModeMaxBall==="function")?cModeMaxBall():39;const cnt={};barNumsNow().forEach(function(n){SB_OFFS_CROSS.forEach(function(o){const t=wrapNum(n,o,max);cnt[t]=(cnt[t]||0)+1})});
+    const levels=[];Object.keys(cnt).forEach(function(k){if(levels.indexOf(cnt[k])<0)levels.push(cnt[k])});levels.sort(function(a,b){return b-a});const keep=levels.slice(0,2);while(keep.length>1&&Object.keys(cnt).filter(function(k){return keep.indexOf(cnt[k])>=0}).length>18)keep.pop();/* 2026-10-01 21:04 使用者指示「超過 18 顆剔除最後一名再重新顯示」：前二名合計超過 18 顆就把最後一名(次數最低那一整批)拿掉 */
+    const list=Object.keys(cnt).map(Number).filter(function(v){return keep.indexOf(cnt[v])>=0}).sort(function(a,b){return cnt[b]-cnt[a]||a-b}).slice(0,18).map(function(v){return {v:v,c:cnt[v]}});
+    SB.crossShowing=true;SB.stats={cnt:cnt,list:list};try{renderStats()}catch(e){}if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}
+    if(typeof logEvent==="function")try{logEvent("單桿十字差統計","桿上 "+barNumsNow().join(",")+" ×十字差 0/+10/-10/+1/-1 → 前二名 "+list.map(function(x){return x.v+"×"+x.c}).join(" "))}catch(e){}
+    clearTimeout(SB.crossShowT);SB.crossShowT=setTimeout(function(){SB.crossShowing=false;if(!SB.on)return;SB.stats=notesStats();try{renderStats()}catch(e){}},10000)}
+  function buildTag(){if(SB.tag)return SB.tag;const g=document.createElement("div");g.id="zp-sb-offset-tag";Object.assign(g.style,{position:"fixed",display:"none",alignItems:"center",justifyContent:"center",zIndex:"9601",background:"#1E63D0",color:"#e02020",border:"2px solid #fff",boxSizing:"border-box",boxShadow:"0 0 4px rgba(0,0,0,0.7)",pointerEvents:"none",overflow:"hidden",whiteSpace:"nowrap"});const sp=document.createElement("span");sp.className="zp-sb-offset-txt";Object.assign(sp.style,{font:"900 20px/1 Arial, Helvetica, sans-serif",color:"#e02020",display:"inline-block"});g.appendChild(sp);document.body.appendChild(g);SB.tag=g;/* 2026-09-28 使用者指示「切換換到單桿下面那個藍色底 -11 那裡做切換，如果該桿不只一個則 -11 閃爍提示」：原算法版中單擊這個欄位＝換到下一個成立的九宮差 *//* 2026-10-01 21:01 使用者指示「註記亮燈，長按十字差按鍵，註記欄顯示單桿五號搭配十字差 5×5 共 25 號統計，顯示前二名，10 秒後恢復原顯示」 */(function(){let tm=0;const st=function(){clearTimeout(tm);if(!SB.on||SB.mode!=="orig"||(SB.oa&&SB.oa.running))return;tm=setTimeout(function(){tm=0;SB.tagLongAt=Date.now();crossTop2Show()},600)};const en=function(){clearTimeout(tm)};g.addEventListener("pointerdown",st);["pointerup","pointercancel","pointerleave"].forEach(function(ev){g.addEventListener(ev,en)});g.addEventListener("contextmenu",function(e){if(SB.on&&SB.mode==="orig")e.preventDefault()})})();g.addEventListener("click",function(e){if(!SB.on||(SB.mode!=="orig"&&SB.mode!=="three")||SB.none||(SB.oa&&SB.oa.running))return;e.preventDefault();e.stopPropagation();const now=Date.now();if(now-(SB.tagTapAt||0)<300)return;if(now-(SB.tagLongAt||0)<900)return;SB.tagTapAt=now;nextOffset()});["pointerdown","touchstart"].forEach(function(ev){g.addEventListener(ev,function(e){if(SB.on&&(SB.mode==="orig"||SB.mode==="three"))e.stopPropagation()},{passive:true})});return g}
   function placeTagText(){const g=buildTag();const sp=g.firstChild;const t=SB.none?"無":((SB.mode==="orig"||SB.mode==="three")?offLabel(SB_OFFS[SB.oi]):"九宮");/* 原算法版顯示目前的九宮差 *//* 2026-09-28 新算法：不再逐一換九宮差，欄位顯示「九宮」(有結果)或「無」 */if(sp.textContent!==t){sp.textContent=t;SB.tagFit=""}g.style.pointerEvents=((SB.mode==="orig"||SB.mode==="three"))?"auto":"none";g.classList.toggle("zp-sb-multi",(SB.mode==="orig"||SB.mode==="three")&&!SB.none&&(SB.validCount||0)>1)}
   function placeTag(tr){const g=buildTag();placeTagText();if(!tr){g.style.display="none";return}
     const side=Array.prototype.slice.call(tr.children).filter(function(td){return td.classList.contains("day")||td.classList.contains("wd")});
@@ -5320,7 +5330,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     barNums.forEach(function(n){const target=wrapNum(n,off,max);g.forEach(function(row){row.forEach(function(cl){if(cl.v===target)markHit(cl.td)})})});
     const below=[];checkRows().slice(1).forEach(function(row){if(row)row.forEach(function(c){if(c.v!==null)below.push(c.v)})});
     const uniq=[];barNums.forEach(function(n){const t=wrapNum(n,off,max);if(uniq.indexOf(t)<0)uniq.push(t)});
-    const show=uniq.filter(function(t){return below.indexOf(t)<0}).sort(function(a,b){return a-b});fillBlank(show)/* 2026-09-29 使用者指示九宮模式空白期也改放目前九宮差的預測號(17/18 期沒中的) */;return show}
+    const show=uniq.slice().sort(function(a,b){return a-b});void below;/* 2026-10-01 20:55 使用者指示「原 17 期有、18 期有，空白期不顯示；現在 17/18 有中的一樣顯示」：空白期放目前九宮差/十字差的全部目標號碼，不再扣掉第 17/18 期開過的 */fillBlank(show)/* 2026-09-29 使用者指示九宮模式空白期也改放目前九宮差的預測號(17/18 期沒中的) */;return show}
   function ranking(cnt){const nums=Object.keys(cnt).map(Number);if(!nums.length)return [];
     const levels=[];nums.map(function(n){return cnt[n]}).sort(function(a,b){return b-a}).forEach(function(c){if(levels.indexOf(c)<0)levels.push(c)});
     let pick=nums.filter(function(n){return cnt[n]>=levels[Math.min(1,levels.length-1)]});
