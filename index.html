@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 16:48";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 17:53";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -211,6 +211,9 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   第7招＝同尾差的第二段 S 的前 3 顆(把第3招的十字差換成同尾差：第一段、第二段都用同尾差)。
   第8招＝隔壁差的第一段 L(把第1招的十字差換成隔壁差)。
   第9招＝隔壁差的第二段 S 的前 3 顆(把第3招的十字差換成隔壁差：第一段、第二段都用隔壁差)。
+  ★無配對就「無」(2026-10-03 17:53 使用者指示)：同尾差、隔壁差、四方差這三種，單桿裡沒有任何兩顆符合該差數的配對(含繞回，例 07 與 36 差 10、39 與 01 差 1)時，
+        候選號全部只有 1 票，第一段不會保留整批 15 顆、第二段也不取前 3，兩招都顯示「無」(第6/7、8/9、10/11招)。十字差、九宮差有 0 與多個差數，維持原規則。
+        (原因：沒配對時第一段＝單桿每顆加減差數的全列、第二段前 3 ＝單桿最小 3 顆，沒有篩選意義；539 回測 30 桿有 6 桿同尾差、若干桿隔壁差屬此情況。)
   第10招＝四方差的第一段 L；第11招＝四方差的第二段 S 的前 3 顆(2026-10-03 16:48 定義；程式內 four()；目前不計入九招最漂亮 A/B 票數、也不在九招視窗顯示，待使用者指示)。
         四方差回測(2026-10-03，最近 30 期／100 期，三期內開出率；隨機 539/天天樂 33.7%、六合/大樂 32.4%)：
         第10招：539 37.9%／36.4%、天天樂 39.1%／35.8%、六合彩 33.6%／29.9%、大樂透 35.8%／32.6%；第11招：539 37.2%／33.7%、天天樂 30.8%／34.5%、六合彩 29.5%／35.2%、大樂透 23.6%／32.6%。
@@ -400,6 +403,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-03 17:53  同尾差／隔壁差／四方差：單桿裡沒有符合該差數的配對(含繞回)時，第一段與第二段都改為「無」(第6/7、8/9、10/11招)；原本會整批列 15 顆、第二段前 3 等於單桿最小 3 顆(使用者指示)。
    2026-10-03 16:48  規格書與程式新增「四方差」＝-10、-1、+10、+1(使用者定義)：第10招＝四方差 L、第11招＝四方差統計表前 3 顆(four())；先只定義與回測，未加入 A/B 計票與九招視窗。
    2026-10-03 16:31  九招視窗第 1 列：「A」「B」標記改成與彩券名同色(紅 #ff4d4d)，號碼顏色不變(A 後淺藍、B 後灰)。
    2026-10-03 16:20  九招視窗第 1 列：新邏輯(不扣票)九招最漂亮號前面加「A」，舊邏輯(扣票)前面的「舊」改為「B」，例：天天樂：A 13 17 39　B 13 29 38。
@@ -7274,7 +7278,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   function top(cnt){const ks=Object.keys(cnt).map(Number);const vals=[];ks.forEach(function(k){if(vals.indexOf(cnt[k])<0)vals.push(cnt[k])});vals.sort(function(a,b){return b-a});const lv=vals.slice(0,2);
     while(lv.length>1&&ks.filter(function(k){return lv.indexOf(cnt[k])>=0}).length>18)lv.pop();
     return ks.filter(function(k){return lv.indexOf(cnt[k])>=0}).sort(function(a,b){return cnt[b]-cnt[a]||a-b})}
-  function cross(bar,mx,O){O=O||DS;const w=function(z){return((z-1)%mx+mx)%mx+1};const c={};bar.forEach(function(n){O.forEach(function(d){const t=w(n+d);c[t]=(c[t]||0)+1})});let L=top(c);/* 2026-10-02 16:42 第1招超過第一二期格數(10 格；六合彩/大樂透 12 格)剔除最後一名，同十字鍵系統 */{const cap=mx>=49?12:10;while(L.length>cap){const lo=c[L[L.length-1]];if(c[L[0]]===lo)break;L=L.filter(function(v){return c[v]!==lo})}}const c2={};
+  function cross(bar,mx,O,needPair){O=O||DS;const w=function(z){return((z-1)%mx+mx)%mx+1};const c={};bar.forEach(function(n){O.forEach(function(d){const t=w(n+d);c[t]=(c[t]||0)+1})});/* 2026-10-03 17:53 使用者指示：同尾差／隔壁差／四方差，單桿裡沒有符合該差數的配對(含繞回，所有候選號都只有 1 票)就「無」——第一段、第二段都不出號 */if(needPair){let mxv=0;Object.keys(c).forEach(function(k){if(c[k]>mxv)mxv=c[k]});if(mxv<2)return{L:[],S2:[],S2v:[],noPair:true}}let L=top(c);/* 2026-10-02 16:42 第1招超過第一二期格數(10 格；六合彩/大樂透 12 格)剔除最後一名，同十字鍵系統 */{const cap=mx>=49?12:10;while(L.length>cap){const lo=c[L[L.length-1]];if(c[L[0]]===lo)break;L=L.filter(function(v){return c[v]!==lo})}}const c2={};
     L.forEach(function(X){O.forEach(function(d){if(bar.indexOf(w(X+d))>=0)L.forEach(function(Y){if(Y!==X){const t=w(Y+d);c2[t]=(c2[t]||0)+1}})})});
     /* 2026-10-02 16:38 修正：第2招要跟十字鍵系統註記欄同一套——所有次數層級由高到低全部列入，超過 18 顆才從最低一層剔除(原本誤用第1招的「只取前二名」) */const S2=(function(){const ks=Object.keys(c2).map(Number);if(!ks.length)return[];const lv=[];ks.forEach(function(k){if(lv.indexOf(c2[k])<0)lv.push(c2[k])});lv.sort(function(x,y){return y-x});while(lv.length>1&&ks.filter(function(k){return lv.indexOf(c2[k])>=0}).length>18)lv.pop();return ks.filter(function(k){return lv.indexOf(c2[k])>=0}).sort(function(x,y){return c2[y]-c2[x]||x-y})})();/* 2026-10-02 16:06 使用者指示「第2招超過 6 顆只取第一名」(只用在這個視窗) */const S2v=S2.length>6?S2.filter(function(v){return c2[v]===c2[S2[0]]}):S2;return{L:L,S2:S2,S2v:S2v}}
   function picks(data,max){const n=data.length;if(n<3)return{a:[],b:[]};const half=Math.floor(max/2);
@@ -7294,8 +7298,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     const a=rank(ca),b=rank(cb).filter(function(v){return a.indexOf(v)<0});return{a:a,b:b}}
   function five(nums,i,max){const cr=cross(nums[i],max);const pk=picks(nums.slice(0,i+1),max);return[cr.L,cr.S2v,cr.S2.slice(0,3),pk.a,pk.b]}
   /* 2026-10-02 17:22 使用者指示「視窗最上面那個不變，下面的一二三四五招改成一、三、六、七、八、九招」：six()＝第1招(十字差 L)、第3招(十字差統計表前 3)、第6招(同尾差 L)、第7招(同尾差統計表前 3)、第8招(隔壁差 L)、第9招(隔壁差統計表前 3)；最上面「最漂亮 3 顆」仍用 five() 原五招算 */
-  /* 2026-10-02 22:08 使用者指示「把九招最漂亮的 3 號顯示在彩券名稱後面」：nine()＝抓牌第1～9招(第2招用完整統計表 S2，不縮減) */function nine(nums,i,max){const a=cross(nums[i],max),b=cross(nums[i],max,[-10,0,10]),c=cross(nums[i],max,[-1,0,1]);const pk=picks(nums.slice(0,i+1),max);return[a.L,a.S2,a.S2.slice(0,3),pk.a,pk.b,b.L,b.S2.slice(0,3),c.L,c.S2.slice(0,3)]}
-  /* 2026-10-03 16:48 使用者定義「四方差」＝-10、-1、+10、+1(十字差去掉 0)：第10招＝四方差第一段 L、第11招＝四方差第二段 S 的前 3 顆；目前只定義與可呼叫(window.__zpFour)，尚未加入九招最漂亮計票與九招視窗 */const D4=[-10,-1,10,1];function four(nums,i,max){const d=cross(nums[i],max,D4);return[d.L,d.S2.slice(0,3),d.S2]}window.__zpFour=function(nums,i,max){return four(nums,i,max)};const KS=[1,3,6,7,8,9];function six(nums,i,max){const a=cross(nums[i],max),b=cross(nums[i],max,[-10,0,10]),c=cross(nums[i],max,[-1,0,1]);return[a.L,a.S2.slice(0,3),b.L,b.S2.slice(0,3),c.L,c.S2.slice(0,3)]}
+  /* 2026-10-02 22:08 使用者指示「把九招最漂亮的 3 號顯示在彩券名稱後面」：nine()＝抓牌第1～9招(第2招用完整統計表 S2，不縮減) */function nine(nums,i,max){const a=cross(nums[i],max),b=cross(nums[i],max,[-10,0,10],true),c=cross(nums[i],max,[-1,0,1],true);const pk=picks(nums.slice(0,i+1),max);return[a.L,a.S2,a.S2.slice(0,3),pk.a,pk.b,b.L,b.S2.slice(0,3),c.L,c.S2.slice(0,3)]}
+  /* 2026-10-03 16:48 使用者定義「四方差」＝-10、-1、+10、+1(十字差去掉 0)：第10招＝四方差第一段 L、第11招＝四方差第二段 S 的前 3 顆；目前只定義與可呼叫(window.__zpFour)，尚未加入九招最漂亮計票與九招視窗 */const D4=[-10,-1,10,1];function four(nums,i,max){const d=cross(nums[i],max,D4,true);return[d.L,d.S2.slice(0,3),d.S2]}window.__zpFour=function(nums,i,max){return four(nums,i,max)};const KS=[1,3,6,7,8,9];function six(nums,i,max){const a=cross(nums[i],max),b=cross(nums[i],max,[-10,0,10],true),c=cross(nums[i],max,[-1,0,1],true);return[a.L,a.S2.slice(0,3),b.L,b.S2.slice(0,3),c.L,c.S2.slice(0,3)]}
   function compute(g,back){const G=GAMES[g];const data=gameData(g);const n=data.length;if(n<40)return null;const nums=data.map(function(r){return r.numbers});/* 2026-10-03 02:20 捲動回溯：e＝本期(最新往前第 back 期) */const e=n-1-(back||0);if(e<40)return null;
     const stat=[0,1,2,3,4,5].map(function(){return{t:0,h:0}});
     for(let i=e-32;i<=e-3;i++){const f=six(nums,i,G.max);const fut={};nums.slice(i+1,i+4).forEach(function(a){a.forEach(function(v){fut[v]=1})});
