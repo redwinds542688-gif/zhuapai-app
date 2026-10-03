@@ -42,7 +42,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 13:45";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 13:56";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -223,6 +223,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   ・第 1 列(2026-10-03 02:58 使用者指示，取代 ◀▶ 回溯鍵)：左上角 ✕(關閉)；中間彩券名(紅)＋九招最漂亮 3 顆(淺藍)；右上角回溯滾輪——顯示本期日期(最新期白字、回溯中黃字)，左邊 ▲▼ 提示可撥方向(到底變空心)；手指在滾輪上往下撥＝回溯(較舊)、往上撥＝往後(較新)，每撥 22px 換一期，放開即停；滑鼠滾輪往下＝回溯、往上＝往後。
   ・每列 15 顆(2026-10-03 02:52 使用者指示，取代下一條的 21 顆)：號碼方塊寬＝(視窗寬－4px)÷15－2px，其餘規則同下一條。例外：某列超過 15 顆(六合彩／大樂透最近 100 期約 5～7% 的列有 16～18 顆、天天樂偶爾 25 顆)時，只有那一列等比縮小到放得下，避免號碼被切掉。
   ・號碼大小(2026-10-03 02:46 使用者指示「字體需要一樣大，每列可以容納 21 個號碼」)：號碼方塊固定寬＝(視窗寬－4px)÷21－2px(左右外距各 1px)、高＝列高－2px；字級＝min(方塊寬÷1.2, 方塊高×0.8)，所有列一樣大，不再單列縮小。
+  ・開機順序(2026-10-03 13:56 使用者指示「先到首頁畫面，需要自適或更新再動作」)：程式打開一律先顯示首頁；等首頁開獎單真的看得到(號碼格可見、沒被藏起來、連續 4 次檢查穩定)再過 0.8 秒，才做①版本檢查(有新版跳「發現新版本」)②需要時的自動校正(「第一次使用／正在為這支手機調整畫面」)；共用 window.__zpWhenHomeShown(最多等 15 秒)。
   ・滾輪文字(2026-10-03 13:45 使用者指示，取代「最新一期依開獎星期推算日期」)：最新一期＝「下期預測」(不顯示日期)；往回捲動＝「預測 MM/DD」(資料裡的下一期日期)。
   ・六區固定順序(2026-10-03 13:26 使用者指示，取代「依最近 30 期三期內開出率由高到低排」)：最漂亮 3 顆下面的六區由上往下固定＝第1招、第3招、第6招、第7招、第8招、第9招。
   ・Ai抓牌全頁截圖鍵(2026-10-03 12:55 使用者指示)：全頁時畫面上看不到原本的截圖鍵(#float-back-btn)＝Ai抓牌，就在第 2 顆鍵的位置(左邊距＋(結束鍵左緣－左邊距)÷4)放 #zp-five-shot-btn「截圖」：大小＝結束鍵、pin-btn 灰底 #8a8a8a 白字圓角 7px、字級＝按鍵高×0.8236(同抓牌十八的截圖鍵 25.53px／31px)；長按 0.55 秒＝九招視窗開著存九招視窗，沒開存全頁截圖。
@@ -375,6 +376,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-03 13:56  開程式先顯示首頁：「第一次使用／正在為這支手機調整畫面」(自動校正)與開機時的版本檢查(發現新版本)，都改成等首頁開獎單真的顯示出來、穩定後 0.8 秒才開始，不再在首頁出現之前就蓋上去；更新後重新開啟接著校正也一樣(使用者指示)。
    2026-10-03 13:45  九招視窗滾輪在最新一期時改顯示「下期預測」，不再推算日期(六合彩停開一週時會推出已過去的日期)；往回捲動時照舊顯示資料裡的「預測 MM/DD」(使用者指示)。
    2026-10-03 13:41  規格書加「★上傳與發布方式」：抓539 改完檢查通過直接推上網站(使用者授權不必再問)、網站儲存庫/分支/網址/檔名、上傳步驟與失敗處理、Ai抓牌只交付檔案(使用者指示；只改規格書，畫面不變)。
    2026-10-03 13:26  九招視窗下面六區改成固定順序 第1、3、6、7、8、9招(由上往下)，不再依最近 30 期開出率排序(使用者指示)。
@@ -6766,10 +6768,14 @@ function go(){t=null;if(document.hidden){return}var w=innerWidth,h=innerHeight;v
       try{if(typeof logEvent==="function")logEvent("版本檢查","重新校正畫面：目前 "+LOCAL+"，最新 "+remote+"，先更新")}catch(e){}
       doUpdate(remote,ov);return "updating"}catch(e){return "latest"}};
   /* 更新後重新開啟：接著執行重新校正畫面 */
-  if(ls("539_calib_after_update")==="1"){ls("539_calib_after_update",null);window.addEventListener("load",function(){setTimeout(function(){try{if(typeof window.__zpCalibrate==="function")window.__zpCalibrate()}catch(e){}},1500)})}
+  if(ls("539_calib_after_update")==="1"){ls("539_calib_after_update",null);window.__zpWhenHomeShown(function(){try{if(typeof window.__zpCalibrate==="function")window.__zpCalibrate()}catch(e){}},800)}
   /* 2026-09-27 使用者指示「更新檢查可以一起附上」：程式一直開在前面時，每 30 分鐘也自動檢查一次(背景中不查，切回來照原本規則) */
   setInterval(function(){if(document.visibilityState==="visible")check()},1800000);
-  /* 2026-09-27 使用者指示「一啟動程式立刻檢查版本」：不再等畫面載完＋3 秒，程式一開就查(這段在頁面最後，畫面元素都已經在了) */check();
+  /* 2026-09-27 使用者指示「一啟動程式立刻檢查版本」 */window.__zpWhenHomeShown=window.__zpWhenHomeShown||function(cb,extra){/* 2026-10-03 13:56 使用者指示「先顯示首頁畫面，之後如果需要自適(校正)或更新再動作」：等首頁開獎單真的顯示出來(號碼格看得到、沒有被藏起來或半透明，連續 4 次檢查都一樣)再等 extra 毫秒才執行；最多等 15 秒 */
+    var ok=0,t0=Date.now();extra=extra==null?800:extra;
+    function shown(){if(document.readyState!=="complete")return false;var t=document.querySelector("#panels table.road td.num");if(!t)return false;var r=t.getBoundingClientRect();if(!(r.width>0&&r.height>0))return false;
+      for(var el=t;el&&el!==document.documentElement;el=el.parentElement){var c=getComputedStyle(el);if(c.display==="none"||c.visibility==="hidden"||parseFloat(c.opacity)<0.99)return false}return true}
+    (function tick(){if(shown())ok++;else ok=0;if(ok>=4||Date.now()-t0>15000){setTimeout(cb,extra);return}setTimeout(tick,150)})()};/* 2026-10-03 13:56 改成先顯示首頁，首頁穩定後 0.8 秒才查 */window.__zpWhenHomeShown(check,800);
   /* 2026-09-30 09:49 使用者指示「進入程式立刻檢查，縮放開獎單也再檢查一次」：
    ①每次進入程式都立刻查(App 從背景切回來、從上一頁/分頁切回來)，取消原本「10 分鐘內不重查」與 1.5 秒延遲；
    ②兩指縮放開獎單，手指全部放開時再查一次(同一次縮放只查一次；5 秒內重複縮放不重查，避免一直連網) */
@@ -7191,7 +7197,12 @@ html body.theme-dark #c-ding-ai-box .ai-box-rank.c-bprev-same{ background:#1F5C3
   window.__zpCalibrate=function(){try{localStorage.removeItem(KEY)}catch(e){}return run(true)};
   window.__zpCalibRunning=function(){return running};
   /* 開機：資料與字型就緒、畫面停在首頁後 1.2 秒才開始(避免跟開機流程搶) */
-  function boot(){var go=function(){setTimeout(function(){run(false)},1200)};if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);else go()}
+  window.__zpWhenHomeShown=window.__zpWhenHomeShown||function(cb,extra){/* 2026-10-03 13:56 使用者指示「先顯示首頁畫面，之後如果需要自適(校正)或更新再動作」：等首頁開獎單真的顯示出來(號碼格看得到、沒有被藏起來或半透明，連續 4 次檢查都一樣)再等 extra 毫秒才執行；最多等 15 秒 */
+    var ok=0,t0=Date.now();extra=extra==null?800:extra;
+    function shown(){if(document.readyState!=="complete")return false;var t=document.querySelector("#panels table.road td.num");if(!t)return false;var r=t.getBoundingClientRect();if(!(r.width>0&&r.height>0))return false;
+      for(var el=t;el&&el!==document.documentElement;el=el.parentElement){var c=getComputedStyle(el);if(c.display==="none"||c.visibility==="hidden"||parseFloat(c.opacity)<0.99)return false}return true}
+    (function tick(){if(shown())ok++;else ok=0;if(ok>=4||Date.now()-t0>15000){setTimeout(cb,extra);return}setTimeout(tick,150)})()};
+  function boot(){var go=function(){window.__zpWhenHomeShown(function(){run(false)},800)};/* 2026-10-03 13:56 先顯示首頁再校正 */if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);else go()}
   if(document.readyState==="complete")boot();else window.addEventListener("load",boot);
 })();</script>
 <script>/* 2026-09-30 21:02 使用者回報「最新開獎球號碼沒有置中」：球用 flex 置中的是字框，手機實際用的字型(例：襯線字)筆畫左右、上下不對稱，實測號碼偏左約 1px、偏下約 1px。
