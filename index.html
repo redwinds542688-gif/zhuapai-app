@@ -29,15 +29,15 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   var dark=false;try{dark=localStorage.getItem("539_theme")==="dark"}catch(e){}
   var st=document.createElement("style");st.id="zp-boot-cover-style";st.textContent="html.zp-boot-cover{background:"+(dark?"#121212":"#e9e9e9")+" !important}html.zp-boot-cover body{opacity:0 !important}";(document.head||document.documentElement).appendChild(st);
   document.documentElement.classList.add("zp-boot-cover");
-  var t0=Date.now(),last="",same=0,done=false;
+  var t0=Date.now(),last="",same=0,done=false;/* 2026-10-03 14:06 已校正過(存的寬高＝目前)＝不用調整：排好就立刻顯示 */var cal=null,NEED=5,STEP=100,MIN=300;function calChk(){/* 要等 viewport 設好(載入完成)才量得到真正的寬高 */if(cal!==null)return;cal=false;try{var cs0=JSON.parse(localStorage.getItem("539_calib_v1")||"null");cal=!!(cs0&&cs0.w===Math.round(innerWidth)&&cs0.h===Math.round(innerHeight))}catch(e){}if(cal){NEED=2;STEP=60;MIN=0}}
   function reveal(){if(done)return;done=true;try{if(typeof window.recenterCellNumbers==="function")window.recenterCellNumbers();if(typeof window.__ballInkCenter==="function")window.__ballInkCenter()}catch(e){}document.documentElement.classList.remove("zp-boot-cover");try{if(typeof window.__layoutKick==="function")window.__layoutKick()}catch(e){}try{if(typeof logEvent==="function")logEvent("開機","首頁排版穩定後顯示 "+(Date.now()-t0)+"ms")}catch(e){}}
   window.__zpBootReveal=reveal;
   function sig(){var t=document.querySelector("#panels table.road td.num");if(!t)return "";var r=t.getBoundingClientRect();if(!(r.width>0&&r.height>0))return "";var sp=t.querySelector(".cell-shift");var cs=sp?getComputedStyle(sp):null;
     var h=document.getElementById("hero");var hr=h?h.getBoundingClientRect():null;var bi=document.querySelector("#hero-balls .ball-ink");var p=document.getElementById("panels");var pr=p?p.getBoundingClientRect():null;
     return [r.left,r.top,r.width,r.height].map(function(v){return v.toFixed(1)}).join(",")+"|"+(cs?cs.fontSize+" "+(sp.style.transform||""):"")+"|"+(hr?hr.height.toFixed(1):"")+"|"+(bi?bi.style.transform:"")+"|"+(pr?pr.width.toFixed(1)+"x"+pr.height.toFixed(1):"")}
   (function tick(){if(done)return;if(Date.now()-t0>5000){reveal();return}
-    if(document.readyState==="complete"){var s=sig();if(s&&s===last)same++;else same=0;last=s;if(s&&same>=5&&Date.now()-t0>300){reveal();return}}
-    setTimeout(tick,100)})();
+    if(document.readyState==="complete"){calChk();var s=sig();if(s&&s===last)same++;else same=0;last=s;if(s&&same>=NEED&&Date.now()-t0>MIN){reveal();return}}
+    setTimeout(tick,STEP)})();
 }catch(e){try{document.documentElement.classList.remove("zp-boot-cover")}catch(x){}}})();</script>
 <script>/* 2026-09-27 使用者指示「(自動調整)都只在手機上執行」：手機/平板＝Android、iPhone、iPad(含偽裝成 Mac 的 iPad)、UA 帶 Mobile；電腦不算 */window.__isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));if(window.__isMobile)document.documentElement.classList.add("is-mobile");
 /* 2026-09-27 使用者指示「電腦/筆電照方式1：把程式當成一支 18高:9寬 的直立手機放在畫面中間；左右空白以後可以出租廣告」：
@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 14:01";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 14:06";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -240,7 +240,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   ・第 1 列(2026-10-03 02:58 使用者指示，取代 ◀▶ 回溯鍵)：左上角 ✕(關閉)；中間彩券名(紅)＋九招最漂亮 3 顆(淺藍)；右上角回溯滾輪——顯示本期日期(最新期白字、回溯中黃字)，左邊 ▲▼ 提示可撥方向(到底變空心)；手指在滾輪上往下撥＝回溯(較舊)、往上撥＝往後(較新)，每撥 22px 換一期，放開即停；滑鼠滾輪往下＝回溯、往上＝往後。
   ・每列 15 顆(2026-10-03 02:52 使用者指示，取代下一條的 21 顆)：號碼方塊寬＝(視窗寬－4px)÷15－2px，其餘規則同下一條。例外：某列超過 15 顆(六合彩／大樂透最近 100 期約 5～7% 的列有 16～18 顆、天天樂偶爾 25 顆)時，只有那一列等比縮小到放得下，避免號碼被切掉。
   ・號碼大小(2026-10-03 02:46 使用者指示「字體需要一樣大，每列可以容納 21 個號碼」)：號碼方塊固定寬＝(視窗寬－4px)÷21－2px(左右外距各 1px)、高＝列高－2px；字級＝min(方塊寬÷1.2, 方塊高×0.8)，所有列一樣大，不再單列縮小。
-  ・首頁先調好再顯示(2026-10-03 14:01 使用者指示)：手機開程式時 html 加 zp-boot-cover(同色系底、內容先不顯示)，等首頁排版穩定(第一格號碼位置大小、字級與置中位移、#hero 高度、開獎球位移、#panels 大小連續 5 次 0.1 秒檢查都不變，且資料字型載入完)才拿掉、一次顯示；最多 5 秒。window.__zpWhenHomeShown 會等到這之後才開始版本檢查與校正。
+  ・首頁先調好再顯示(2026-10-03 14:01 使用者指示)：手機開程式時 html 加 zp-boot-cover(同色系底、內容先不顯示)，等首頁排版穩定(第一格號碼位置大小、字級與置中位移、#hero 高度、開獎球位移、#panels 大小連續 5 次 0.1 秒檢查都不變，且資料字型載入完)才拿掉、一次顯示；最多 5 秒。已校正過的手機(539_calib_v1 存的寬高＝目前)不用調整：連續 2 次(每 0.06 秒)不變就立刻顯示(2026-10-03 14:06)。window.__zpWhenHomeShown 會等到這之後才開始版本檢查與校正。
   ・開機順序(2026-10-03 13:56 使用者指示「先到首頁畫面，需要自適或更新再動作」)：程式打開一律先顯示首頁；等首頁開獎單真的看得到(號碼格可見、沒被藏起來、連續 4 次檢查穩定)再過 0.8 秒，才做①版本檢查(有新版跳「發現新版本」)②需要時的自動校正(「第一次使用／正在為這支手機調整畫面」)；共用 window.__zpWhenHomeShown(最多等 15 秒)。
   ・滾輪文字(2026-10-03 13:45 使用者指示，取代「最新一期依開獎星期推算日期」)：最新一期＝「下期預測」(不顯示日期)；往回捲動＝「預測 MM/DD」(資料裡的下一期日期)。
   ・六區固定順序(2026-10-03 13:26 使用者指示，取代「依最近 30 期三期內開出率由高到低排」)：最漂亮 3 顆下面的六區由上往下固定＝第1招、第3招、第6招、第7招、第8招、第9招。
@@ -394,6 +394,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-03 14:06  開機遮罩加快：這支手機已經校正過(存的螢幕寬高跟現在一樣)＝不用調整，首頁排好就立刻顯示(連續 2 次、每 0.06 秒檢查不變即可，不再多等 0.5 秒)；沒校正過才照原本等 0.5 秒穩定(使用者指示「不用調整就直接開始程式」)。
    2026-10-03 14:01  開程式首頁先調整好再顯示：手機開程式先蓋一層同色底，等首頁排版穩定(開獎單、號碼字級置中、開獎區、開獎球連續 0.5 秒不變，最多 5 秒)才一次顯示首頁；之後才做版本檢查與自動校正(使用者指示)。
    2026-10-03 13:56  開程式先顯示首頁：「第一次使用／正在為這支手機調整畫面」(自動校正)與開機時的版本檢查(發現新版本)，都改成等首頁開獎單真的顯示出來、穩定後 0.8 秒才開始，不再在首頁出現之前就蓋上去；更新後重新開啟接著校正也一樣(使用者指示)。
    2026-10-03 13:45  九招視窗滾輪在最新一期時改顯示「下期預測」，不再推算日期(六合彩停開一週時會推出已過去的日期)；往回捲動時照舊顯示資料裡的「預測 MM/DD」(使用者指示)。
