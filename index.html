@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 00:00";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 00:04";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -403,6 +403,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 00:04  最少藏 0.2→0.1 秒(手機診斷版 00:00 實測：共藏 216ms、版面 0.22 秒穩定，0.2 秒門檻多等 60ms)。
    2026-10-04 00:00  換畫面加速(依使用者手機診斷版數據：進全頁藏 350～375ms，版面約 240ms 後定下、再等 4 幀共 140ms)：藏著時版面與上一幀相同才做號碼比例＋置中(原本每幀都做，白做 50～80ms)；連續 2 幀穩定即顯示(原 4)；最少藏 0.2 秒(原 0.3)；寬度演算法同輸入 1 秒內不重複(省 41ms)。不做殘影、不淡入。
    2026-10-03 23:27  畫面切換退回 19:18 版的做法：22:58～23:18 五版為了「捏合進全頁先全黑再出現」做的殘影交接／淡入／最少 0.1 秒／寬度演算法去重，在使用者手機上實測反而更糟(全黑從約 0.35 秒變成約 1.4 秒、殘影沒出現)，全部撤回；程式內容(含四方差刪除)與 19:18 相同。
    2026-10-03 19:18  刪除「四方差」(使用者指示)：拿掉 D4／four()／window.__zpFour 與規格書第10/11招；回測證明十字差的 +0 很重要，第一段改四方差會讓第2/3招命中率下降。
@@ -7074,7 +7075,7 @@ html body.theme-dark table.road tr td.num.num.num.num.num.num.num.num.c-ding-top
    改成：這些時候先把開獎單藏起來，排版連續 4 幀不再變動才一次顯示(換畫面至少 0.3 秒、轉向至少 0.8 秒)。 */
 html.zp-entering #panels, html.zp-entering .scroller, html.zp-entering #connect-svg, html.zp-entering [id^="zp-sc-"], html.zp-entering [id^="zp-sb-"], html.zp-entering svg[id$="-svg"], html.zp-entering [id$="-lines-clip"], html.zp-entering #c-ding-left-blank-frame, html.zp-entering #blank-period-right-line-overlay, html.zp-entering #c-ding-ai-box, html.zp-entering #bottom-frame-line-wrap, html.zp-entering #fullpage-header-line, html.zp-entering #fullpage-edge-line-left, html.zp-entering #fullpage-edge-line-right, html.zp-entering #full-page-function-zone-outline, html.zp-entering #data-blank-divider-line, html.zp-entering div[id^="c-mode-"], html.zp-entering div[id^="e-mode-"], html.zp-entering svg[id^="c-mode-"], html.zp-entering svg[id^="e-mode-"]{ visibility:hidden !important; }/* 2026-09-28 使用者回報「會先看到連線再看到畫面出現」：三層的紅框/綠線/紅線、單桿把手/標籤、C式E式連線等浮在開獎單上的圖層一起藏 */
 </style>
-<script>(function(){var raf=0,t0=0,last="",same=0,guard=0,lastScreen="",lastW=0,minMs=200;/* 2026-10-04 00:00 最少藏 0.3→0.2 秒(手機實測版面約 0.24 秒後就不再動) */
+<script>(function(){var raf=0,t0=0,last="",same=0,guard=0,lastScreen="",lastW=0,minMs=100;/* 2026-10-04 00:04 最少藏 0.3→0.1 秒：手機診斷版實測版面 0.22 秒穩定、0.27 秒已連續 2 幀，0.2 秒門檻反而多等 60ms；穩定判斷照舊 */
 var SCREEN=["catch-card-fit-mode"/* 主程式九宮格(抓牌首頁) */,"zhuapai-mode","pinch-fullscreen-mode","zp-sanceng","zp-single-bar","recent-only-mode","magnifier-mode","c-mode-active","game-wide","game-mark6","game-lotto"];
 function screenSig(){var b=document.body.classList;return SCREEN.filter(function(c){return b.contains(c)}).join(" ")}
 function sig(){var td=null,list=document.querySelectorAll("#panels td.num");for(var i=0;i<list.length&&i<400;i++){var r0=list[i].getBoundingClientRect();if(r0.height>0&&r0.bottom>0&&r0.top<innerHeight){td=list[i];break}}
@@ -7083,7 +7084,7 @@ function sig(){var td=null,list=document.querySelectorAll("#panels td.num");for(
   return [Math.round(r.left*2),Math.round(r.top*2),Math.round(r.width*2),Math.round(r.height*2),fs,P?P.style.transform+"|"+P.style.zoom:"",S?S.style.transform+"|"+S.style.width:""].join(",")}
 function done(){document.documentElement.classList.remove("zp-entering");if(raf){cancelAnimationFrame(raf);raf=0}clearTimeout(guard)}
 function tick(){raf=0;var s=sig();if(s===last)same++;else{same=0;last=s}/* 2026-10-04 00:00 手機實測：版面還在動的那幾幀就做號碼比例＋置中，每輪白做 50～80ms 還會讓版面再變一次。改成版面跟上一幀相同時才做；做完若比例變了就重新計穩定幀 */if(same>=1){try{var tb=document.querySelector("#panels table.road"),f0=tb?tb.style.getPropertyValue("--num-fit"):"";if(window.__numFitRun)window.__numFitRun();var f1=tb?tb.style.getPropertyValue("--num-fit"):"";if(f1!==f0&&window.recenterCellNumbers){window.recenterCellNumbers();same=0;last=sig()}}catch(e){}}if((same>=2&&performance.now()-t0>minMs)||performance.now()-t0>minMs+600){done();return}/* 2026-10-04 00:00 連續 2 幀穩定即顯示(原 4 幀，手機每幀 40～45ms，省約 90ms) */raf=requestAnimationFrame(tick)}
-function hide(ms){minMs=Math.max(ms||200,(raf&&minMs)||0);var b=document.body.classList;if(b.contains("capturing-plain")||b.contains("capturing-save-only")||b.contains("capturing-clean-sheet"))return;/* 存圖中不動 */
+function hide(ms){minMs=Math.max(ms||100,(raf&&minMs)||0);var b=document.body.classList;if(b.contains("capturing-plain")||b.contains("capturing-save-only")||b.contains("capturing-clean-sheet"))return;/* 存圖中不動 */
   document.documentElement.classList.add("zp-entering");t0=performance.now();last="";same=0;clearTimeout(guard);guard=setTimeout(done,minMs+800);if(!raf)raf=requestAnimationFrame(tick)}
 window.__sheetHideUntilStable=hide;
 function obs(){var b=document.body;lastScreen=screenSig();lastW=Math.round(innerWidth);
