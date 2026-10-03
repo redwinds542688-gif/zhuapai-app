@@ -42,7 +42,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 13:26";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-03 13:41";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -58,6 +58,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
  1. 版本時間：每次修改(不論大小)都要把 window.APP_BUILD 改成當下台灣時間(到分鐘)，而且一定要比上一版新(同一分鐘改兩次就 +1 分鐘)；
     「修改紀錄」最上面新增一筆「時間＋改了什麼」；交付檔名用同一個時間：主程式「Ai抓牌 YYYY-MM-DD HHMM.html」、副程式「抓539 YYYY-MM-DD HHMM.html」。
     網站上的「抓539」檔名固定為 index.html(內容＝副程式)。APP_VERSION 只在大改版才升(它會送給 Worker)。
+    ★抓539 改完、檢查通過後直接推上網站，不必再問使用者(2026-10-03 13:41 使用者授權；步驟與路徑見「四、版本檢查與更新」的「★上傳與發布方式」)。
  2. 兩支程式同步：抓牌、三層、單桿(九宮/長按註記/特殊算法)、版本檢查、開獎球置中、切回程式保存等共用段落，主程式與副程式一定要一起改、行為一致。
     只有主程式有：抓牌首頁(九宮格選單)、C式、E式、C式定位/合匯、統計表、瓢蟲除錯紀錄。只有副程式有：安裝提示(iPhone/Android/三星)、manifest/sw.js 安裝包。
  3. 修改後必做檢查：①所有 <script> 語法檢查；②四種彩券(539、天天樂、六合彩、大樂透)；③亮色系、暗色系；④手機直立；
@@ -270,6 +271,19 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
  ・「立即更新」：註銷 service worker、刪快取、下載新檔(最多等 8 秒)再重新開啟；更新後仍舊版＝顯示刪除 App 重新加入主畫面的步驟。
  ・sw.js(副程式網站用)：網頁與版本檢查一律先上網(沒網路才用快取)，其他檔案先用快取再背景更新；修改 sw.js 時 CACHE 版本號要加 1。
  ・網站上傳清單：index.html(副程式)、sw.js、manifest.json、icon-192.png、apple-touch-icon.png。
+ ・★上傳與發布方式(2026-10-03 13:41 使用者指示「把自動上傳的邏輯跟上傳方式、路徑寫進程式」)：
+   ①使用者授權(2026-10-03 13:26)：副程式「抓539」每次修改完成、檢查通過後，直接推上網站，不必再詢問使用者。只限抓539 網站；其他儲存庫(drawtiles、Lottery-database…)仍要先問。
+   ②網站位置：GitHub 儲存庫 redwinds542688-gif/zhuapai-app，分支 main，網站由 GitHub Pages 自動發布(推上 main 後約 1～2 分鐘生效)；
+     網址 https://redwinds542688-gif.github.io/zhuapai-app/ ；網站上的抓539 檔名固定為 index.html(內容＝副程式整份檔案，不改名內容)。
+     同目錄另有 sw.js、manifest.json、icon-192.png、icon-192-maskable.png、icon-512.png、icon-512-maskable.png、apple-touch-icon.png、上傳說明.txt；只改程式時只換 index.html，sw.js 有改才換(CACHE 版本號要 +1)。
+   ③上傳步驟(推之前一定先做完鐵則 3 的檢查，至少：所有 <script> 語法檢查、瀏覽器實際開啟測過改到的功能、沒有錯誤)：
+     1. 取最新 main(git fetch origin main)；確認工作分支(Claude 的工作分支，例 ccr-…)包含 main 最新內容，沒有就先把 main 合併進來(使用者也可能自己從網頁上傳)。
+     2. 把交付檔「抓539 YYYY-MM-DD HHMM.html」複製成 index.html，commit(訊息寫版本時間＋改了什麼)。
+     3. 推工作分支，再把同一個提交推上 main(git push origin HEAD:main)；main 有別人(使用者網頁上傳)的新提交時先合併，衝突時保留 APP_BUILD 較新的那份 index.html，不可強制覆蓋(force push)。
+     4. 推完讀 main 上 index.html 的 window.APP_BUILD，確認＝這次的版本時間，才回報「已上傳」。
+   ④上傳失敗(例 GitHub 回 403 沒有權限)：不重試硬推，告訴使用者到 GitHub → Settings → Applications → Claude → Configure → Repository access 把 zhuapai-app 加進去，並把檔案直接交給使用者手動上傳。
+   ⑤主程式「Ai抓牌」目前沒有網站：只交付檔案「Ai抓牌 YYYY-MM-DD HHMM.html」給使用者，不上傳。
+   ⑥網站更新後：使用者打開網站或桌面圖示會出現「發現新版本」→「立即更新」；設定選單「重新校正畫面」也會先更新到最新版本(見上方「重新校正畫面」)。
 
 ────────────────────────────────────────
 四之二、(僅主程式) C式差數
@@ -360,6 +374,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-03 13:41  規格書加「★上傳與發布方式」：抓539 改完檢查通過直接推上網站(使用者授權不必再問)、網站儲存庫/分支/網址/檔名、上傳步驟與失敗處理、Ai抓牌只交付檔案(使用者指示；只改規格書，畫面不變)。
    2026-10-03 13:26  九招視窗下面六區改成固定順序 第1、3、6、7、8、9招(由上往下)，不再依最近 30 期開出率排序(使用者指示)。
    2026-10-03 12:55  全頁沒有截圖鍵時(Ai抓牌)在第 2 顆鍵位置加「截圖」鍵：大小、灰底白字、字級跟抓牌十八底部的截圖鍵一樣；長按＝九招視窗開著存九招視窗，沒開存全頁截圖(使用者指示)。抓539 全頁本來就有截圖鍵，不受影響。
    2026-10-03 12:48  九招視窗截圖不畫左上角 ✕(位置保留，標題仍置中)(使用者指示)。
