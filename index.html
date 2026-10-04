@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 12:19";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 12:24";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -196,6 +196,13 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
      大樂透：第4招 12.2%／31.2%；第5招 12.7%／32.6%(12.2／32.4)
      第5招約有 1/3 的期數算不出號碼(要被 2 組以上同時算到)。結論：天天樂第5招最好，但樣本約 150 顆，還不能確定有效。
      (更正：抓牌三招回測寫的 539／天天樂隨機基準 34.5% 應為 33.7%。)
+ ★中獎範圍(定義；2026-10-04 12:24 使用者命名，以後常用；鎖定，沒有命令不可更改；程式內 zpWinRange()，window.__zpWinRange)：
+  用途：看某一組號碼(例：十字鍵系統藍鍵每一步的「第1招全部＋差數 d」)在開獎單上從單桿往上、往下的連續中獎期數。
+  ①單桿那一期與單桿以下的期數，全部列入範圍(單桿在最新一期時下面是空白期；回溯時下面就是之後實際開出的結果)。
+  ②單桿以上：從單桿上一期開始一期一期往上看，這一期只要開出這組號碼裡的任何一個就列入範圍，再往上一期；遇到一期一個都沒開就停，更上面的不論有沒有開都不算。
+  ③被其他顯示蓋住的列(例：十字鍵系統第一二期放第1招、第三四列放第1招＋d)不列入，也不往上越過。
+  ④範圍內開出這組號碼的格子用標定(粉紅)顯示；範圍以外不顯示。範圍從上到下連成一段，段越長＝這組號碼連續中獎的期數越多。
+  目前使用處：十字鍵系統藍鍵每一步(見「十字鍵系統藍鍵」)。「全」不用中獎範圍，照舊整個畫面標定註記欄號碼。
  ★抓牌九招總表(2026-10-02 17:17 使用者命名第6～9招，並指示「邏輯要寫清楚，抓牌一到九招全部寫進程式」；本段為九招的權威定義，細節與回測見上下各段)：
   名詞：十字差＝0、+10、-10、+1、-1；九宮差＝-11、-10、-9、-1、0、+1、+9、+10、+11；同尾差＝-10、0、+10；隔壁差＝-1、0、+1。
         號碼加差數超過範圍就繞回(539/天天樂 1～39、六合彩/大樂透 1～49；例 39+1＝01、01-1＝39)。單桿＝單桿所在那一期的開獎號碼(5 或 6 顆)。
@@ -406,6 +413,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 12:24  把「中獎範圍」定義寫進規格書(使用者命名，以後常用)，程式抽成獨立函式 zpWinRange()(window.__zpWinRange)：單桿與以下全算；單桿往上逐期，有開出就算、遇到一期沒有就停；被蓋住的列不算。十字鍵系統藍鍵改呼叫這個函式，顯示結果不變。
    2026-10-04 12:19  藍鍵走到某一組時，把第1招全部＋該差數的號碼顯示在畫面第三、四列(像第1招一樣排，橘底橘字，與第1招紫色區分)，連線改從第三、四列對應那一格連到單桿 b，不再從第1招連線；第三、四列被蓋住期間不算標定(往上找連續段到第五列為止)。回到「全」、捲動或離開時恢復原號碼(使用者指示)。
    2026-10-04 12:02  藍鍵差數步驟的標定範圍：單桿與以下照標；單桿往上逐期看，有標定號碼就顯示並繼續往上，遇到一期一個都沒有就停，更上面不顯示(使用者指示)。
    2026-10-04 11:51  藍鍵連線改沿兩格中心的直線(最短路徑，同其他連線)：起點＝這條線穿過 X 格下邊框的點，終點＝穿過 b 格上邊框的點，線不進格子(11:50 取兩邊框最近點時，相鄰欄的線會壓在格線上)。
@@ -5605,7 +5613,13 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
   function crossSysExit(){SB.crossSys=false;SB.crossMark=null;SB.crossShowing=false;SB.crossStats=null;crossOvHide();if(SB.on){SB.stats=notesStats();runSearch(SB.oi)}if(typeof logEvent==="function")try{logEvent("單桿十字差統計","返回＝離開十字鍵系統")}catch(e){}}
   /* 2026-10-04 11:01 使用者指示「藍色按鍵：目前標記所有註記欄號碼＝『全』，可切換 全→0→+1→-1→+10→-10→全 循環」：十字鍵系統中藍鍵單擊切換標定範圍。
      全＝畫面上與註記欄(第2招統計表)同號的格子全部標定(原本的做法)；選某個差數 d＝只標定「第2招由 d 這個差算出來」的那些註記欄號碼。九宮模式差數依序 0、+1、-1、+10、-10、+9、-9、+11、-11。註記欄、綠框、第一二期、空白期第3招都不受影響；換桿／捲動重算時保留目前選擇，離開十字鍵系統恢復「全」。 */
-  function crossMarkApply(clear){if(!SB.crossList2)return;if(clear){let __bar=false;SB.hits.forEach(function(td){try{if(td.classList.contains("zp-sb-cell"))__bar=true;td.classList.remove("zp-sb-hit","num-marked","num-marked-click")}catch(e){}});SB.hits=[];if(__bar){try{paint(rowOf(SB.period))}catch(e){}}}const m=SB.crossMark;const step=(typeof m==="number"&&SB.crossSteps)?SB.crossSteps[m]:null;const __set={};if(!step){SB.crossList2.forEach(function(x){__set[x.v]=1})}else{(SB.crossL||[]).forEach(function(y){__set[wrapNum(y,step.d,SB.crossMax||39)]=1})}/* 2026-10-04 11:39 全＝註記欄號碼；某一步(X 對 b，差 d)＝第1招全部號碼各＋d 當標定號碼 */const __g=grid();let __from=2;if(step){/* 2026-10-04 11:47 使用者指示「單桿以上的標定號碼不用顯示」：藍鍵走到某一組時，只標單桿那一列和單桿以下；「全」照舊整個畫面 */const __btr=rowOf(SB.period);const __bi=__g.findIndex(function(row){return row&&row.length&&row[0]&&row[0].td&&row[0].td.closest("tr")===__btr});if(__bi>=0){__from=Math.max(4,__bi);/* 2026-10-04 12:02 使用者指示：單桿上一期如果有標定號碼就顯示，再往上一期有就再顯示，遇到某一期一個都沒有就停，更上面的都不顯示 */while(__from-1>=4){/* 2026-10-04 12:19 第三、四列被「第1招＋差數」蓋住，不算也不標 */const __r=__g[__from-1];if(__r&&__r.some(function(cl){return cl&&cl.v!=null&&__set[cl.v]}))__from--;else break}}}__g.forEach(function(row,ri){if(ri<__from)return;row.forEach(function(cl){if(cl&&__set[cl.v])markHit(cl.td)})});try{placeTagText()}catch(_){}try{requestAnimationFrame(function(){crossLinkDraw(step)})}catch(_){}}
+/* ★中獎範圍(2026-10-04 12:24 使用者定義「中獎範圍」，以後常用，邏輯固定在這個函式)：
+   輸入：rows＝畫面上由上到下每一期的格子(每格 {td,v})；set＝要找的號碼集合(物件 {號碼:1})；barIdx＝單桿那一期在 rows 的位置；top＝最上面可以算的那一期位置(被蓋住的列不算)。
+   規則：①單桿那一期與以下全部算在範圍內。②從單桿上一期開始一期一期往上看：這一期至少開出 set 裡一個號碼就算進範圍、再看上一期；遇到一期一個都沒有就停，更上面的不算。
+   回傳：{from:範圍最上面那一期的位置, barIdx, upCount:單桿以上連續中的期數, rows:範圍內每一期有中的號碼}。單桿找不到時回傳 null。 */
+  function zpWinRange(rows,set,barIdx,top){if(!rows||barIdx==null||barIdx<0)return null;top=Math.max(0,top||0);let from=Math.max(top,barIdx);while(from-1>=top){const r=rows[from-1];if(r&&r.some(function(cl){return cl&&cl.v!=null&&set[cl.v]}))from--;else break}const hit=[];for(let i=from;i<rows.length;i++){const r=rows[i]||[];hit.push(r.filter(function(cl){return cl&&cl.v!=null&&set[cl.v]}).map(function(cl){return cl.v}))}return{from:from,barIdx:barIdx,upCount:Math.max(0,barIdx-from),rows:hit}}
+  window.__zpWinRange=zpWinRange;
+  function crossMarkApply(clear){if(!SB.crossList2)return;if(clear){let __bar=false;SB.hits.forEach(function(td){try{if(td.classList.contains("zp-sb-cell"))__bar=true;td.classList.remove("zp-sb-hit","num-marked","num-marked-click")}catch(e){}});SB.hits=[];if(__bar){try{paint(rowOf(SB.period))}catch(e){}}}const m=SB.crossMark;const step=(typeof m==="number"&&SB.crossSteps)?SB.crossSteps[m]:null;const __set={};if(!step){SB.crossList2.forEach(function(x){__set[x.v]=1})}else{(SB.crossL||[]).forEach(function(y){__set[wrapNum(y,step.d,SB.crossMax||39)]=1})}/* 2026-10-04 11:39 全＝註記欄號碼；某一步(X 對 b，差 d)＝第1招全部號碼各＋d 當標定號碼 */const __g=grid();let __from=2;if(step){/* 2026-10-04 12:24 改用「★中獎範圍」zpWinRange()：第三、四列被第1招＋差數蓋住，所以 top＝4 */const __btr=rowOf(SB.period);const __bi=__g.findIndex(function(row){return row&&row.length&&row[0]&&row[0].td&&row[0].td.closest("tr")===__btr});const __wr=zpWinRange(__g,__set,__bi,4);if(__wr){__from=__wr.from;SB.crossWinRange=__wr}}__g.forEach(function(row,ri){if(ri<__from)return;row.forEach(function(cl){if(cl&&__set[cl.v])markHit(cl.td)})});try{placeTagText()}catch(_){}try{requestAnimationFrame(function(){crossLinkDraw(step)})}catch(_){}}
   function crossTop2Show(){if(!SB.on||(SB.mode!=="orig"&&SB.mode!=="three"))return;/* 2026-10-02 16:38 使用者指示「九宮裡長按九宮差按鍵(單桿下面藍色鍵)一樣用 1、2、3 招的邏輯，只是搭配九宮差不是十字差」：九宮模式改用九宮差 9 個(-11,-10,-9,-1,0,+1,+9,+10,+11) */const __OFFS=SB.mode==="three"?SB_OFFS_NINE:SB_OFFS_CROSS;const max=(typeof cModeMaxBall==="function")?cModeMaxBall():39;const cnt={};barNumsNow().forEach(function(n){__OFFS.forEach(function(o){const t=wrapNum(n,o,max);cnt[t]=(cnt[t]||0)+1})});
     const levels=[];Object.keys(cnt).forEach(function(k){if(levels.indexOf(cnt[k])<0)levels.push(cnt[k])});levels.sort(function(a,b){return b-a});const keep=levels.slice(0,2);while(keep.length>1&&Object.keys(cnt).filter(function(k){return keep.indexOf(cnt[k])>=0}).length>18)keep.pop();/* 2026-10-02 16:42 使用者指示「超過 10 格剔除最後一名」：第一二期只有 10 格(六合彩/大樂透 12 格)，前二名放不下就再剔除最後一名(次數最低那一整批) */{const __cap=max>=49?12:10;while(keep.length>1&&Object.keys(cnt).filter(function(k){return keep.indexOf(cnt[k])>=0}).length>__cap)keep.pop()}/* 2026-10-01 21:04 使用者指示「超過 18 顆剔除最後一名再重新顯示」：前二名合計超過 18 顆就把最後一名(次數最低那一整批)拿掉 */
     const list=Object.keys(cnt).map(Number).filter(function(v){return keep.indexOf(cnt[v])>=0}).sort(function(a,b){return cnt[b]-cnt[a]||a-b}).slice(0,18).map(function(v){return {v:v,c:cnt[v]}});
