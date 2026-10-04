@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 18:56";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 19:00";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -495,6 +495,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 19:00  抓牌畫面最下面空白期(第 19 列)不顯示日期、星期(使用者指示)；往回捲時被清成空白期的列也一樣。
    2026-10-04 18:56  抓牌畫面星期字再往左移螢幕 1px(使用者指示)，共往左 2 螢幕 px。
    2026-10-04 18:52  抓牌畫面星期字改畫在格子本身並往左移螢幕 1px(同新程式 18:44／18:52，使用者多次截圖回報星期偏右)：整張表不等比放大後格子與文字畫法位置差 4～6 個螢幕像素；改成星期字做成格子自己的置中圖，跟格子同一套畫法；撤回 18:21、18:25 兩次沒效果的改法；淡出時跟號碼、日期一起變透明。
    2026-10-04 18:32  捲動淡出改成號碼、日期、星期一起淡化(使用者指示「日期、星期、號碼一起淡化」)；鐵則第 10 條①同步修改。
@@ -5398,10 +5399,10 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     let lo=0,hi=all.length-1,i0=-1;while(lo<=hi){const mid=(lo+hi)>>1;const r=all[mid].getBoundingClientRect();if(r.height>0&&r.top>=-2){i0=mid;hi=mid-1}else lo=mid+1}
     if(i0<0)return null;return all[i0+18]||null}
   function strip(tr){Array.prototype.forEach.call(tr.querySelectorAll("td.num.zp-r19"),function(td){STRIP.forEach(function(c){td.classList.remove(c)})})}
-  function cover(tr){Array.prototype.forEach.call(tr.querySelectorAll("td.num"),function(td){if(td.classList.contains("zp-r19")||td.classList.contains("zp-sb-cover"))return;
+  function cover(tr){try{tr.classList.add("zp-r19-row")}catch(e){}Array.prototype.forEach.call(tr.querySelectorAll("td.num"),function(td){if(td.classList.contains("zp-r19")||td.classList.contains("zp-sb-cover"))return;
       const real=normalizedNum(td);td.dataset.zpR19Orig=(function(){const k=td.cloneNode(true);Array.prototype.forEach.call(k.querySelectorAll("[style]"),function(el){el.style.removeProperty("opacity")});return k.innerHTML})();/* 2026-09-27 存號碼時拿掉拖動淡出的透明度(原本存到透明的號碼，還原後號碼看不見) */td.dataset.zpR19Had7=td.dataset.streak7Num!==undefined?"1":"0";if(td.dataset.streak7Num===undefined)td.dataset.streak7Num=real;
       td.innerHTML='<span class="cell-shift">&nbsp;</span>';td.classList.add("zp-r19")});strip(tr);R.row=tr}
-  function uncover(){let any=false;Array.prototype.forEach.call(panels.querySelectorAll("td.num.zp-r19"),function(td){any=true;td.classList.remove("zp-r19");if(td.dataset.zpR19Orig!==undefined)td.innerHTML=td.dataset.zpR19Orig;Array.prototype.forEach.call(td.querySelectorAll(".cell-shift"),function(sp){sp.style.removeProperty("opacity")});
+  function uncover(){let any=false;try{Array.prototype.forEach.call(panels.querySelectorAll("tr.zp-r19-row"),function(t){t.classList.remove("zp-r19-row")})}catch(e){}Array.prototype.forEach.call(panels.querySelectorAll("td.num.zp-r19"),function(td){any=true;td.classList.remove("zp-r19");if(td.dataset.zpR19Orig!==undefined)td.innerHTML=td.dataset.zpR19Orig;Array.prototype.forEach.call(td.querySelectorAll(".cell-shift"),function(sp){sp.style.removeProperty("opacity")});
       if(td.dataset.zpR19Had7==="0")delete td.dataset.streak7Num;delete td.dataset.zpR19Orig;delete td.dataset.zpR19Had7});R.row=null;
     if(any){try{__r19Busy=true;applyMarksToClone()}catch(e){}finally{__r19Busy=false}}}
   let __r19Busy=false;
@@ -7681,5 +7682,9 @@ html body.recent-only-mode:not([class*="capturing"]) table.road td.wd[data-wdimg
  function start(){sch();try{new MutationObserver(sch).observe(document.body,{attributes:true,attributeFilter:["class"]})}catch(e){}(function w(){const P=document.getElementById("panels");if(!P){setTimeout(w,300);return}try{new MutationObserver(sch).observe(P,{childList:true,subtree:true,characterData:true})}catch(e){}})();setInterval(sch,2000)}
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
 })();</script>
+<style>/* 2026-10-04 19:00 使用者指示「最下面空白期，星期、日期不用顯示」：抓牌畫面第 19 列(空白期＝tr.future，或往回捲時被清成空白期的列 tr.zp-r19-row)的日期、星期一律不顯示；截圖/存圖不受影響 */
+html body.recent-only-mode:not([class*="capturing"]) table.road tr.future td.day *, html body.recent-only-mode:not([class*="capturing"]) table.road tr.future td.wd .badge, html body.recent-only-mode:not([class*="capturing"]) table.road tr.zp-r19-row td.day *, html body.recent-only-mode:not([class*="capturing"]) table.road tr.zp-r19-row td.wd .badge{ visibility:hidden !important; }
+html body.recent-only-mode:not([class*="capturing"]) table.road tr.future td.wd[data-wdimg], html body.recent-only-mode:not([class*="capturing"]) table.road tr.zp-r19-row td.wd[data-wdimg]{ background-image:none !important; }
+</style>
 </body>
 </html>
