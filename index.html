@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 18:32";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 18:52";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -495,6 +495,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 18:52  抓牌畫面星期字改畫在格子本身並往左移螢幕 1px(同新程式 18:44／18:52，使用者多次截圖回報星期偏右)：整張表不等比放大後格子與文字畫法位置差 4～6 個螢幕像素；改成星期字做成格子自己的置中圖，跟格子同一套畫法；撤回 18:21、18:25 兩次沒效果的改法；淡出時跟號碼、日期一起變透明。
    2026-10-04 18:32  捲動淡出改成號碼、日期、星期一起淡化(使用者指示「日期、星期、號碼一起淡化」)；鐵則第 10 條①同步修改。
    2026-10-04 18:25  星期字置中改用絕對定位(使用者第三次截圖回報「還是太偏右」)：不再靠量字再推，星期字直接放在徽章正中心(left/top 50%＋回移自身一半，垂直再下 0.056em)，手機字型或字級放大都對得準。
    2026-10-04 18:21  修星期字在手機上沒有置中(使用者兩次截圖回報，偏右約 8%；鐵則「號碼、日期、星期一律置中」)：星期置中原本用畫布量字形，手機缺指定字型時畫布與畫面退回不同字型、量錯；改成直接量畫面上實際排出的字(水平＝字框中心；垂直＝基線上 0.38em，中文字設計框的中心)對準徽章中心，不受字型影響。
@@ -1147,10 +1148,8 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
       var font=(cs.fontStyle&&cs.fontStyle!=="normal"?cs.fontStyle+" ":"")+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
       var m=inkMetrics(font,text); if(!m)return;
       var sc=ancestorScale(b); var bm=parseMatrix(getComputedStyle(b).transform); var sx=sc.x*bm.s, sy=sc.y*bm.s;
-      /* 2026-10-04 18:19 鐵則「星期一律置中」(使用者兩次截圖回報「星期沒有置中」，手機上星期字偏右約 8%)：原本用畫布(canvas)量字形墨跡，但手機沒有指定字型時，畫布與畫面各自退回不同的字型，量到的跟實際畫出來的不一樣，修正反而推偏。
-         改成直接量畫面上這個字實際排出來的字框(Range)，讓字框中心對準徽章中心——中文字在自己的字框裡本來就是置中設計，不管手機用哪一種字型都準 */
-      var inkCx=null,inkCy=null; try{ var __rg=document.createRange(); __rg.selectNodeContents(g); var __rr=__rg.getBoundingClientRect(); if(__rr.width>0&&__rr.height>0){ inkCx=__rr.left+__rr.width/2; var __bo=null; try{ __bo=baselineOffset(g,cs,sy); }catch(_b){} var __fs=parseFloat(cs.fontSize)||0; inkCy=(__bo!==null&&isFinite(__bo)&&__fs>0)? (r.top+__bo*sy-0.38*__fs*sy) : (__rr.top+__rr.height/2); /* 垂直：中文字設計框在基線上 0.88em～下 0.12em，中心＝基線上 0.38em(各字型通用)；量不到基線才退回字框中心 */ } }catch(_e){}
-      if(inkCx===null){ inkCx=perCharInkCenter(g,text,font,sx); if(inkCx===null)inkCx=r.left+(m.right-m.left)/2*sx; inkCy=r.top+baselineOffset(g,cs,sy)*sy+(m.desc-m.asc)/2*sy; }
+      var inkCx=perCharInkCenter(g,text,font,sx); if(inkCx===null)inkCx=r.left+(m.right-m.left)/2*sx;
+      var inkCy=r.top+baselineOffset(g,cs,sy)*sy+(m.desc-m.asc)/2*sy;
       var dx=(br.left+br.width/2-inkCx)/(sx||1), dy=(br.top+br.height/2-inkCy)/(sy||1);
       if(!isFinite(dx)||!isFinite(dy))return;
       jobs.push({g:g,t:"translate("+dx.toFixed(2)+"px,"+dy.toFixed(2)+"px)"});
@@ -5438,10 +5437,10 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     const rows=dataRowsForFade();const seen=new Set();
     for(let i=rows.length-1;i>=0;i--){const rr=rows[i].getBoundingClientRect();if(rr.height<=0)continue;if(rr.bottom<Y-1)break;
       const f=Math.max(0,Math.min(1,(rr.bottom-Y)/rr.height));
-      /* 2026-10-04 18:32 使用者指示「日期、星期、號碼一起淡化」：淡出改成號碼、日期、星期三種一起變透明(格線、底色照常) */Array.prototype.forEach.call(rows[i].querySelectorAll("td.num, td.day, td.wd"),function(td){const sp=td.querySelector(".cell-shift")||td;if(f<=0){return}sp.style.setProperty("opacity",(1-f).toFixed(3),"important");V.faded.add(sp);seen.add(sp)})}
-    V.faded.forEach(function(sp){if(!seen.has(sp)){sp.style.removeProperty("opacity");V.faded.delete(sp)}});
+      /* 2026-10-04 18:32 使用者指示「日期、星期、號碼一起淡化」：淡出改成號碼、日期、星期三種一起變透明(格線、底色照常) */Array.prototype.forEach.call(rows[i].querySelectorAll("td.num, td.day, td.wd"),function(td){const sp=td.querySelector(".cell-shift")||td;if(f<=0){return}sp.style.setProperty("opacity",(1-f).toFixed(3),"important");V.faded.add(sp);seen.add(sp);if(td.classList.contains("wd")){td.style.setProperty("--wdop",(1-f).toFixed(3));V.faded.add(td);seen.add(td);if(window.__wdImgApply)window.__wdImgApply()}})}
+    V.faded.forEach(function(sp){if(!seen.has(sp)){sp.style.removeProperty("opacity");sp.style.removeProperty("--wdop");V.faded.delete(sp)}});if(window.__wdImgApply)window.__wdImgApply();
     V.loop=requestAnimationFrame(fadeFrame)}
-  function clearFade(){V.faded.forEach(function(sp){try{sp.style.removeProperty("opacity")}catch(e){}});V.faded.clear();if(V.loop){cancelAnimationFrame(V.loop);V.loop=0}}
+  function clearFade(){V.faded.forEach(function(sp){try{sp.style.removeProperty("opacity");sp.style.removeProperty("--wdop")}catch(e){}});try{if(window.__wdImgApply)window.__wdImgApply()}catch(e){}V.faded.clear();if(V.loop){cancelAnimationFrame(V.loop);V.loop=0}}
   function startFade(){if(R.row)uncover();/* 拖動開始：先還原第 19 列(內容換回號碼)，改由淡出處理 */if(!V.loop)V.loop=requestAnimationFrame(fadeFrame)}
   function hideVeil(){if(V.el)V.el.style.display="none"}
   document.addEventListener("pointerdown",function(e){if(!fadeOk())return;const t=e.target;if(!t||!t.closest||!t.closest("#panels"))return;clearTimeout(V.hideT);V.dragging=true;V.moved=false;V.x0=e.clientX;V.y0=e.clientY;if(!V.settle)measureGeo()},true);
@@ -7665,11 +7664,21 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
  document.addEventListener("touchend",function(e){if(e.touches&&e.touches.length===0){down=0;arm()}},true);
  window.__zpAlignCheck=check;
 })();</script>
-<style>/* ★星期字置中(2026-10-04 18:25，鐵則「號碼、日期、星期一律置中」；使用者第三次截圖回報「還是太偏右」)：前兩次都是改「量字再推」，手機上照樣偏右，表示手機實際排出的字跟量到的不一致(字型或系統字級放大)。
-   改成不靠量測：星期字用絕對定位放在徽章正中心(left/top 50%＋往回移自己寬高的一半)，不管手機字型、字放大多少都會對準中心；垂直再往下 0.056em(中文字設計框中心在行框中心下方約 0.056em)。
-   程式的量測位移(transform)一律被這條蓋過；截圖/存圖的星期由 drawWdBadges 自己畫，不受影響。 */
-html body table.road td.wd .badge{ position:relative !important; overflow:visible !important; }
-html body table.road td.wd .badge .wd-g{ position:absolute !important; left:50% !important; top:50% !important; margin:0 !important; white-space:nowrap !important; transform:translate(-50%, calc(-50% + 0.056em)) !important; }
+<style>/* ★抓牌畫面星期字畫在格子本身(2026-10-04 18:44；鐵則「號碼、日期、星期一律置中」；使用者多次截圖回報星期偏右)：
+   原因：抓牌畫面把整張表不等比放大約 3.5 倍，星期徽章又再放大 1.3 倍，瀏覽器畫格子底色/格線(會對齊整數像素)與畫文字(不對齊)的位置在放大後差到 4～6 個螢幕像素，方向還因手機而異(實機偏右、模擬器偏左)，程式量到的位置都是「置中」，量不出來。
+   改法：抓牌畫面(recent-only-mode)裡，星期字改成格子自己的一層圖(td::before 背景圖，內容是置中的星期字)，跟格子底色、格線用同一套方式畫，永遠對齊格子中心；原本的星期字藏起來(不影響截圖/存圖，那邊另外畫)。淡出時跟號碼、日期一起變透明(--wdop)。 */
+html body.recent-only-mode table.road td.wd{ position:relative; }
+html body.recent-only-mode:not([class*="capturing"]) table.road td.wd[data-wdimg]{ background-image:var(--wdimg) !important; background-repeat:no-repeat !important; background-position:calc(50% - var(--wddx,0px)) center !important; background-size:80% auto !important; }/* 2026-10-04 18:52 使用者指示「星期往左移動 1px」：--wddx＝螢幕 1px 換算成格子座標(除以開獎單放大倍率) */
+html body.recent-only-mode:not([class*="capturing"]) table.road td.wd[data-wdimg] .badge{ color:transparent !important; -webkit-text-fill-color:transparent !important; background:transparent !important; box-shadow:none !important; }/* 徽章自己的灰底放大 1.3 倍後會超出格子、讓看到的灰色比格子寬(方向因手機而異)，抓牌畫面裡拿掉，看到的灰色＝格子本身 */
 </style>
+<script>(function(){const cache={};
+ function color(td){const b=document.body;const dark=b.classList.contains("theme-dark");const fut=td.closest("tr")&&td.closest("tr").classList.contains("future");return dark?(fut?"#777":"#9a9a9a"):"#555"}
+ function img(ch,col,op){if(op===undefined)op=1;const k=ch+col+op;if(cache[k])return cache[k];const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="Noto Sans TC, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif" font-size="100" fill="'+col+'" fill-opacity="'+op+'">'+ch+'</text></svg>';return cache[k]='url("data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'")'}
+ function apply(){try{const on=document.body.classList.contains("recent-only-mode");let dx=0;try{const P=document.getElementById("panels");const m=new DOMMatrix(getComputedStyle(P).transform);const sx=(m.a||1)*(parseFloat(P.style.zoom)||1);dx=1/sx}catch(e){dx=0.25}document.querySelectorAll("#panels table.road td.wd").forEach(function(td){if(!on){if(td.hasAttribute("data-wdimg")){td.removeAttribute("data-wdimg");td.style.removeProperty("--wdimg")}return}const b=td.querySelector(".badge");const ch=(b?b.textContent:td.textContent||"").trim();if(!ch){if(td.hasAttribute("data-wdimg")){td.removeAttribute("data-wdimg");td.style.removeProperty("--wdimg")}return}const op=parseFloat(td.style.getPropertyValue("--wdop"));const o=isFinite(op)?Math.max(0,Math.min(1,Math.round(op*20)/20)):1;const key=ch+color(td)+o;if(td.getAttribute("data-wdimg")!==key){td.setAttribute("data-wdimg",key);td.style.setProperty("--wdimg",img(ch,color(td),o))}if(td.style.getPropertyValue("--wddx")!==dx.toFixed(3)+"px")td.style.setProperty("--wddx",dx.toFixed(3)+"px")})}catch(e){}}
+ let q=0;function sch(){if(q)return;q=requestAnimationFrame(function(){q=0;apply()})}
+ window.__wdImgApply=apply;
+ function start(){sch();try{new MutationObserver(sch).observe(document.body,{attributes:true,attributeFilter:["class"]})}catch(e){}(function w(){const P=document.getElementById("panels");if(!P){setTimeout(w,300);return}try{new MutationObserver(sch).observe(P,{childList:true,subtree:true,characterData:true})}catch(e){}})();setInterval(sch,2000)}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
+})();</script>
 </body>
 </html>
