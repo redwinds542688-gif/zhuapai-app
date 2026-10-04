@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 15:56";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 15:59";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -117,6 +117,12 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     首頁、全頁、抓牌、三層、單桿、存圖、印單，所有畫面與輸出裡的開獎單號碼、日期、星期都要在格子裡置中(左右、上下都置中，做法見鐵則 8 量筆畫)。
     任何修改(字級、號碼大小比例、框線粗細、底色、拉伸、縮放、紙張 A3/A4)都不可以破壞置中；改完要實際量測確認(存圖要量輸出的圖)。
     2026-10-04 14:38 實測存圖(號碼 66%)：號碼欄偏移 ≤0.7%、日期欄 1.3%、星期欄 1.8%(皆 1～3 紙張 px，屬於格線寬度誤差內)。
+ 15. ★先復原、再揭幕(2026-10-04 15:59 使用者規定「把這個修法也寫進鐵律」；起因：存檔後開獎單高度往上縮)：
+    凡是會暫時改動版面、並用遮罩蓋住的動作(存檔、截圖、印單、切換畫面、進出全頁、重畫開獎單…)，結束時一律「先把版面復原，等它穩定了才拿掉遮罩」，不可以先拿掉遮罩再復原。
+    ①復原包含：擷取用的字級/版面拿掉、全頁重新對齊與高度拉伸(refitFullPageSheet)、寬度檢查(__fpWidthGuard)、標記與連線重畫。
+    ②穩定＝開獎單位置、大小、變形(transform)連續 3 幀不再改變；最少等 0.12 秒、最多 1.5 秒(超過就直接拿掉，不能卡住)。
+    ③只延後拿掉遮罩，不改存出來的圖、不改功能；做法見程式內「★存檔後遮罩延後拿掉」(監看 #capture-mask，所有用到它的存檔/截圖/印單都適用)。
+    ④新增任何會用遮罩的動作，都要照這條做，並實測：遮罩拿掉後的第一個畫面就要是正確的版面(不能看到變形、縮小、空白再彈回來)。
 ────────────────────────────────────────
 一、畫面一覽
 ────────────────────────────────────────
@@ -435,6 +441,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 15:59  規格書鐵則新增第 15 條「先復原、再揭幕」(使用者指示「把這個修法也寫進鐵律」)：遮罩蓋住的動作結束時，一律先復原版面、等穩定(連續 3 幀不變，0.12～1.5 秒)才拿掉遮罩。程式行為不變。
    2026-10-04 15:56  修存檔後開獎單高度往上縮(使用者錄影回報，並指示主副程式一起改)：存檔/截圖/印單完成時「處理中…」遮罩先留住，全頁立刻重新對齊拉伸，等開獎單連續幾幀不再變動(最少 0.12 秒、最多 1.5 秒)才拿掉遮罩；存出來的圖不變。
    2026-10-04 14:38  規格書鐵則新增第 14 條「號碼、日期、星期一律置中」(使用者規定「這是不變的鐵律」)，含所有畫面與存圖/印單；並實測 66% 存圖置中無誤。程式行為不變。
    2026-10-04 14:36  存圖/印單號碼大小改成墨跡寬＝格子寬 66%(使用者看過 62/66/68/72 對照圖後指定)；ZP_CAPTURE_NUM_INK 0.62→0.66，其他不動。
