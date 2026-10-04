@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 16:11";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 17:57";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -481,6 +481,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 17:57  修抓牌畫面捲動後星期沒有置中(鐵則「號碼、日期、星期一律置中」；新程式使用者截圖回報，三支共用同一段程式)：往回捲再捲回最新時，重新出現的列星期徽章被號碼置中誤處理而偏右下約 3px、7px；號碼置中改成只處理號碼/日期，並清掉已被推偏的星期徽章。
    2026-10-04 16:11  規格書鐵則新增第 19 條「首頁功能」(使用者指示「首頁功能也寫進鐵律，主程式、副程式、新程式各自寫各自的首頁」)：標題與彩券鍵、開獎區、按鍵列各鍵功能、抓牌/結束、開獎單、進全頁、雲端讀取與更新、修改後實測項目。程式行為不變。
    2026-10-04 16:08  規格書鐵則新增第 18 條「全頁功能」(使用者指示「全頁功能也寫進鐵律」)：進入離開、畫面與紅線、滿版與拉伸、縮放移動與極限、底部按鍵、長按彩券鍵九招視窗、切換彩券無殘影、標記保留、適用的其他鐵則與修改後實測項目。程式行為不變。
    2026-10-04 16:06  規格書鐵則新增第 17 條「存圖、印單」(使用者指示「存圖印單也寫進鐵律」)：按鍵與長按、印單不畫標記且一律亮色系、存圖照畫面、A3/A4 紙張 300dpi 貼紙緣、號碼 66% 與置中、遮罩與復原、改完要實際存圖檢查。程式行為不變。
@@ -1061,8 +1062,12 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     if(!document.body)return;
     /* 2026-09-22：平滑捲動進行中(body.c-drag-scroll)不重算——整張表只是 translateY，格內幾何不變；放手拿掉這個 class 時 body 的 class 觀察器會排一次全表重算 */
     if(document.body.classList.contains("c-drag-scroll")||__inkHold){ __inkSkipped=true; return; }
+    /* 2026-10-04 17:57 鐵則「號碼、日期、星期一律置中」(使用者指正「日期星期號碼置中，不是鐵律嗎？」)：開獎單列重新出現時(抓牌往回捲再捲回、空白期還原)，變動通知會把星期徽章(td.wd .badge，也帶 cell-shift)直接丟進來，被當成號碼置中、整個徽章被推偏(約右 3px、下 7px)。
+       星期只由 centerBadges 置中徽章裡的字，這裡一律只處理 SEL 範圍內的號碼/日期；已經被推偏的星期徽章清掉偏移(同新程式 17:56) */
+    if(els){ els.forEach(function(el){ try{ if(el.closest&&el.closest("td.wd")&&el.style.transform){ el.style.removeProperty("transform"); el.removeAttribute("data-ink-centered"); } }catch(e){} }); els=els.filter(function(el){ return el.matches&&el.matches(SEL); }); }
     if(!els)els=Array.prototype.slice.call(document.querySelectorAll(SEL));
-    if(!els.length)return;
+    try{ document.querySelectorAll("table.road td.wd .badge.cell-shift[data-ink-centered]").forEach(function(b){ b.style.removeProperty("transform"); b.removeAttribute("data-ink-centered"); }); }catch(e){}
+    if(!els.length){ try{ centerBadges(); }catch(e){} return; }
     if(inCapture()||supported===false){ clearInline(els); try{ centerBadges(); }catch(e){} return; }
     clearInline(els);
     try{ prefetchBaselines(els.map(function(el){ return [el,getComputedStyle(el)]; }).filter(function(p){ return (p[0].textContent||"").trim()&&p[1].display!=="none"; })); }catch(e){}
