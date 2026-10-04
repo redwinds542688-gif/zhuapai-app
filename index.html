@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 18:25";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 18:32";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -103,7 +103,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     (例：十字鍵系統、單桿九宮/長按註記、回溯進度、目前十字差/九宮差、註記累計)，不能退回上一層。新增任何系統或模式時，
     都要把它的狀態加進重畫前的快照(單桿＝__zpSbSnap／__zpSbRestore)，重畫後在原位置重算並恢復顯示；只有使用者按「返回」才離開。
  10. ★畫面捲動一律用這一套(2026-10-02 01:10 使用者規定，以後任何畫面、任何系統只要捲動都照做，不能另做一套)：
-    ①號碼淡出(淡化捲動)：拖動時固定一條淡出線(空白期上緣／第 19 格)，號碼依越線比例變透明，只動號碼透明度，不用白色遮罩；放手定位後恢復。
+    ①號碼淡出(淡化捲動)：拖動時固定一條淡出線(空白期上緣／第 19 格)，號碼依越線比例變透明，只動號碼、日期、星期的透明度(三種一起淡化，2026-10-04 18:32 使用者指示)，不用白色遮罩；放手定位後恢復。
       詳細做法見程式內「★★ 2026-09-26 09:30 抓牌捲動＝號碼淡出」說明(抓牌、單桿、C式/E式下桿拖到底都已套用)。
     ②桿位固定框：捲動開始時在每支桿(單桿／C式上下桿／E式中桿)目前的螢幕位置放一個整列固定框＝底色 --mark-predict-color 35%＋1px 框 --mark-line-color，
       涵蓋整列號碼格(含特別號格)；捲動中框不跟著表格動，桿頭也停在原位；落定後拿掉框。(C式＝#c-drag-scroll-ab，單桿＝#zp-sb-scroll-frame)
@@ -495,6 +495,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 18:32  捲動淡出改成號碼、日期、星期一起淡化(使用者指示「日期、星期、號碼一起淡化」)；鐵則第 10 條①同步修改。
    2026-10-04 18:25  星期字置中改用絕對定位(使用者第三次截圖回報「還是太偏右」)：不再靠量字再推，星期字直接放在徽章正中心(left/top 50%＋回移自身一半，垂直再下 0.056em)，手機字型或字級放大都對得準。
    2026-10-04 18:21  修星期字在手機上沒有置中(使用者兩次截圖回報，偏右約 8%；鐵則「號碼、日期、星期一律置中」)：星期置中原本用畫布量字形，手機缺指定字型時畫布與畫面退回不同字型、量錯；改成直接量畫面上實際排出的字(水平＝字框中心；垂直＝基線上 0.38em，中文字設計框的中心)對準徽章中心，不受字型影響。
    2026-10-04 17:59  同新程式移植(使用者指示「主副程式一起改」)：①全頁滑動更順(手勢中不重量按鍵/號碼/版面/外框/底部按鍵、倍率沒變不重套縮放、不重複 add 全頁 class、手勢中捲動邊界沿用)；②抓牌畫面直立時一指移動擋掉瀏覽器整頁捲動＋觸控交給程式(touch-action:none)，整頁被捲動立刻捲回；③抓牌捲動停在半列自動重新對齊、捲動後重新置中號碼與星期；④抓牌滑動中底部遮片與註記欄維持原位，「註記」鍵不再被切到。
@@ -5437,7 +5438,7 @@ window.__zpStepCount=function(){while(__zpSteps.length&&__zpSteps[__zpSteps.leng
     const rows=dataRowsForFade();const seen=new Set();
     for(let i=rows.length-1;i>=0;i--){const rr=rows[i].getBoundingClientRect();if(rr.height<=0)continue;if(rr.bottom<Y-1)break;
       const f=Math.max(0,Math.min(1,(rr.bottom-Y)/rr.height));
-      Array.prototype.forEach.call(rows[i].querySelectorAll("td.num"),function(td){const sp=td.querySelector(".cell-shift")||td;if(f<=0){return}sp.style.setProperty("opacity",(1-f).toFixed(3),"important");V.faded.add(sp);seen.add(sp)})}
+      /* 2026-10-04 18:32 使用者指示「日期、星期、號碼一起淡化」：淡出改成號碼、日期、星期三種一起變透明(格線、底色照常) */Array.prototype.forEach.call(rows[i].querySelectorAll("td.num, td.day, td.wd"),function(td){const sp=td.querySelector(".cell-shift")||td;if(f<=0){return}sp.style.setProperty("opacity",(1-f).toFixed(3),"important");V.faded.add(sp);seen.add(sp)})}
     V.faded.forEach(function(sp){if(!seen.has(sp)){sp.style.removeProperty("opacity");V.faded.delete(sp)}});
     V.loop=requestAnimationFrame(fadeFrame)}
   function clearFade(){V.faded.forEach(function(sp){try{sp.style.removeProperty("opacity")}catch(e){}});V.faded.clear();if(V.loop){cancelAnimationFrame(V.loop);V.loop=0}}
