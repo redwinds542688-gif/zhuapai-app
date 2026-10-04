@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 14:12";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 14:23";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -421,6 +421,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 14:23  全頁寬度列入自動偵測(使用者指示「程式要自動偵測，把這部分列入偵測」)：每 1.5 秒、回到前景、畫面尺寸改變時檢查；全頁最小尺寸下開獎單寬 < 螢幕寬 97% 就自動重算(同一狀態只修一次)，每次偵測記在 window.__fpWidthLog。
    2026-10-04 14:12  修全頁寬度(使用者回報 iPhone 16「全頁的畫面寬度需要不留白，有時候正常，有時候縮減寬度」)：寬度演算法最後「整頁有橫向溢出就把開獎單再縮小」那一步，原本看整頁 scrollWidth，別的元件暫時超出右邊也會把開獎單誤縮且不會恢復；改成只看開獎單自己超出的量(最多收 2%)。另加全頁寬度保險：進全頁後、0.5 秒、1.5 秒各檢查一次，最小尺寸時開獎單寬小於螢幕寬 97% 就強制重算。
    2026-10-04 13:04  更正(使用者指示「我說的是連線那一個才需要加框加底色，沒有連線的不需要」)：尋找基數只有連線那一格(第1招 X＋d)加框加底色、字粗體；其他格不加框不加底色，只保留橘色字(亮 #D9480F／暗 #FFB066)。
    2026-10-04 13:03  尋找基數加框加底色(使用者指示「號碼要明顯」)：框 2px 並提高優先順序(原本 1px 框被開獎單格線規則蓋掉看不到)；亮色系 底 #FFC078、框 #E8590C、字 #5C1A00；暗色系 底 #B35900、框 #FFB066、字白；字一律粗體。
@@ -3864,6 +3865,23 @@ function clampFullPageScrollX(desiredX){
   return Math.max(0,x);
 }
 window.clampFullPageScrollX=clampFullPageScrollX;
+/* ★全頁寬度自動偵測(2026-10-04 14:23 使用者指示「程式要自動偵測，把這部分列入偵測」；起因：iPhone 16 全頁寬度有時縮小、左右留白)：
+   時機：①每 1.5 秒 ②App 回到前景／pageshow ③畫面尺寸改變(轉向、網址列)。
+   條件：在全頁(pinch-fullscreen-mode)、已顯示完成、最小尺寸(pageZoom=1)、手指沒有按在螢幕上、App 在前景。
+   判定：開獎單寬度 < 螢幕寬 97% ＝寬度縮小異常 → 呼叫 __fpWidthGuard 強制重算寬度並重新對齊拉伸。
+   同一種異常狀態(螢幕寬＋開獎單寬相同)只修一次，修不好不會一直重跑；每次偵測都記在 window.__fpWidthLog(最多 20 筆：時間、時機、修前寬、修後寬、螢幕寬)，之後要查原因可以直接看。 */
+(function(){let __last="",__touch=0;window.__fpWidthLog=window.__fpWidthLog||[];
+ document.addEventListener("touchstart",function(e){__touch=e.touches?e.touches.length:1},{capture:true,passive:true});
+ ["touchend","touchcancel"].forEach(function(ev){document.addEventListener(ev,function(e){__touch=e.touches?e.touches.length:0},{capture:true,passive:true})});
+ function chk(tag){try{if(document.hidden||__touch>0)return;const b=document.body;if(!b.classList.contains("pinch-fullscreen-mode")||!window.__fullPageDisplayReady)return;if(typeof pageZoom==="number"&&pageZoom!==1)return;if(typeof window.__fpWidthGuard!=="function")return;const pe=document.getElementById("panels");if(!pe)return;const cw=document.documentElement.clientWidth;const w=pe.getBoundingClientRect().width;if(!(w>0)||!(cw>0))return;if(w>=cw*0.97){__last="";return}
+  const key=cw+"|"+Math.round(w);if(key===__last)return;__last=key;window.__fpWidthGuard("自動偵測:"+tag);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){try{const w2=pe.getBoundingClientRect().width;const L=window.__fpWidthLog;L.push({t:new Date().toLocaleTimeString("zh-TW",{hour12:false}),tag:tag,before:Math.round(w*10)/10,after:Math.round(w2*10)/10,screen:cw});if(L.length>20)L.shift();if(w2>=cw*0.97)__last=""}catch(_){}})})}catch(e){}}
+ setInterval(function(){chk("每1.5秒")},1500);
+ document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(function(){chk("回到前景")},400)});
+ window.addEventListener("pageshow",function(){setTimeout(function(){chk("pageshow")},400)});
+ window.addEventListener("resize",function(){setTimeout(function(){chk("尺寸改變")},600)});
+ window.__fpWidthCheck=chk;})();
+
 function enterFullPageSheetFromCatchCard(){
   const wrapEl=document.getElementById("page-zoom-wrap");
   document.body.classList.remove("catch-card-fit-mode");
