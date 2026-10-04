@@ -59,7 +59,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 14:38";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 15:56";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -435,6 +435,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-04 15:56  修存檔後開獎單高度往上縮(使用者錄影回報，並指示主副程式一起改)：存檔/截圖/印單完成時「處理中…」遮罩先留住，全頁立刻重新對齊拉伸，等開獎單連續幾幀不再變動(最少 0.12 秒、最多 1.5 秒)才拿掉遮罩；存出來的圖不變。
    2026-10-04 14:38  規格書鐵則新增第 14 條「號碼、日期、星期一律置中」(使用者規定「這是不變的鐵律」)，含所有畫面與存圖/印單；並實測 66% 存圖置中無誤。程式行為不變。
    2026-10-04 14:36  存圖/印單號碼大小改成墨跡寬＝格子寬 66%(使用者看過 62/66/68/72 對照圖後指定)；ZP_CAPTURE_NUM_INK 0.62→0.66，其他不動。
    2026-10-04 14:33  存圖/印單號碼縮小(使用者指示「存圖照設定 A3/A4 的比例走，只是裡面號碼有點太大」)：紙張比例、格子、日期、星期、標題不動，只把開獎單號碼(含標記圓圈裡的號碼)的墨跡寬由格子寬 72% 改成 62%，跟全頁畫面號碼佔格寬的比例一樣；設定值 ZP_CAPTURE_NUM_INK。
@@ -7530,6 +7531,23 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     tabs.addEventListener("contextmenu",function(e){if(e.target.closest("button[data-game]"))e.preventDefault()});
     tabs.addEventListener("click",function(e){if(Date.now()-longAt<1500){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()}},true)}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);else bind();
+})();</script>
+<script>/* ★存檔後遮罩延後拿掉(2026-10-04 15:50 使用者錄影回報「存檔，開獎單高度向上縮」；使用者指示「查一下主副程式有沒有這個問題，有就一起改」，同新程式 15:50 的修法)：
+   原因：截圖/存檔完成時程式先把「處理中…」遮罩(#capture-mask)拿掉，之後才把開獎單復原(擷取用的字級/版面拿掉、全頁高度拉伸 scaleY 約 0.5 秒後才補回)，
+   所以拿掉遮罩那一瞬間看得到開獎單變形、高度往上縮、下面一片空白，然後才彈回來。
+   修法：遮罩被拿掉時先把它留住，全頁就立刻重新對齊拉伸(refitFullPageSheet＋寬度保險)，等開獎單位置大小連續幾幀都不再變(最少 120ms、最多 1.5 秒)才真的拿掉。
+   所有用到 #capture-mask 的存檔/截圖/印單都適用；只延後拿掉遮罩，不改存出來的圖。 */
+(function(){let hold=false,obs=null;
+ function snap(){const pe=document.getElementById("panels");if(!pe)return "";const r=pe.getBoundingClientRect();return [Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height),getComputedStyle(pe).transform].join("|")}
+ function release(m){hold=false;m.dataset.zpHold="";m.style.display="none"}
+ function holdMask(m){if(hold)return;hold=true;m.dataset.zpHold="1";m.style.display="flex";
+  try{if(document.body.classList.contains("pinch-fullscreen-mode")){if(typeof window.refitFullPageSheet==="function")window.refitFullPageSheet();if(typeof window.__fpWidthGuard==="function")window.__fpWidthGuard("存檔後")}}catch(e){}
+  const t0=performance.now();let last="",same=0;
+  (function tick(){const now=performance.now();const k=snap();if(k&&k===last)same++;else{same=0;last=k}
+   if((same>=3&&now-t0>=120)||now-t0>1500){release(m);return}requestAnimationFrame(tick)})()}
+ function watch(m){if(obs)return;obs=new MutationObserver(function(){if(m.dataset.zpHold==="1"&&!hold)return;if(m.style.display==="none"&&!hold&&m.dataset.zpWasShown==="1"){m.dataset.zpWasShown="";holdMask(m)}else if(m.style.display!=="none"&&!hold){m.dataset.zpWasShown="1"}});obs.observe(m,{attributes:true,attributeFilter:["style"]});if(m.style.display!=="none")m.dataset.zpWasShown="1"}
+ function find(){const m=document.getElementById("capture-mask");if(m)watch(m);return !!m}
+ if(!find()){const bo=new MutationObserver(function(){if(find())bo.disconnect()});bo.observe(document.body,{childList:true})}
 })();</script>
 </body>
 </html>
