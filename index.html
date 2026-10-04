@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-04 21:55";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-05 05:05";/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -182,7 +182,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
       原因：整張表不等比放大後，格子/格線與文字的畫法位置差 4～6 個螢幕像素且方向因手機而異，程式量不到；「量字再推」的做法一律不可再用。
     ②最下面空白期(第 19 列：tr.future 或往回捲被清成空白的 tr.zp-r19-row)：日期、星期不顯示。
     ③捲動淡出：號碼、日期、星期三種一起淡化(鐵則 10①)。
-    ④進入抓牌：左邊註記欄按鍵、底部遮片跟開獎單同一幀揭幕(都藏在換畫面遮罩 html.zp-entering／body.c-ding-entering 下)。
+    ④進入抓牌：左邊註記欄按鍵、底部遮片跟開獎單同一幀揭幕(都藏在換畫面遮罩 html.zp-entering／body.c-ding-entering 下)；三層的進出不走這個遮罩(換版本來就是同一幀完成，遮罩反而灰一下像跳動；2026-10-05 05:05，同新程式)。
     ⑤號碼不可由小變大：換畫面遮罩期間一律不算「手勢中」(版面工作照舊在遮罩下做完)；遮罩的穩定判斷包含號碼比例(--num-fit 與號碼 transform)，比例還在變就不揭幕。
     ⑥抓牌捲動：直立時一指移動擋掉瀏覽器整頁捲動(touch-action:none)，整頁被捲動立刻捲回；停在半列自動重新對齊(手離開 0.7／1.6 秒後檢查)；捲動後重新置中號碼與星期；滑動中底部遮片與註記欄維持原位。
     ⑦全頁滑動：手勢中(最後一次觸控/捲動後 0.18 秒內)不重量按鍵/號碼/版面/外框/底部按鍵，手停下來再各跑一次；倍率沒變不重套縮放；已在全頁不重複 add class；捲動邊界在手勢中沿用。
@@ -505,6 +505,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-05 05:05  使用者指示「進入三層再退出畫面會跳動的問題，主副程式也要修正」(同新程式 03:35)：進出三層時換畫面遮罩把開獎單、左欄藏 0.25～0.47 秒、中間一片灰，看起來像跳動；三層的進出其實是同一幀完成換版，不需要遮罩，把三層(zp-sanceng)從換畫面遮罩的名單拿掉，畫面直接銜接。其他畫面的遮罩不變。規格書鐵則 21④ 補註。
    2026-10-04 21:55  使用者指示「抓539 與 Ai抓牌 的存圖連線也要一起改」(同新程式 21:30)：存出來的圖連線約佔號碼格寬 20%、螢幕放大看時約 6%——存圖的連線原本固定畫「畫面 3px×擷取倍率」，格子卻照存圖當下的大小畫，沒放大時線相對粗 3 倍。改成連線寬＝兩端號碼格寬的 6%，不隨存圖當下的縮放改變，最細 1px。規格書「存圖、印單」③同步。
    2026-10-04 19:20  規格書鐵則新增第 20 條「抓牌畫面與換畫面定案」(使用者確認「這些已經完美，把最後修法結果也寫進鐵律」)：星期由格子本身畫＋左移 2px、空白期不顯示日期星期、三種一起淡化、同一幀揭幕、號碼不由小變大、抓牌捲動保護、全頁滑動不重量。程式行為不變。
    2026-10-04 19:15  換畫面遮罩的穩定判斷加入號碼比例(--num-fit 與號碼 transform)：比例還在變就不揭幕，進入抓牌不會再看到號碼由小變大。
@@ -7272,7 +7273,7 @@ html body.theme-dark table.road tr td.num.num.num.num.num.num.num.num.c-ding-top
 html.zp-entering #panels, html.zp-entering .scroller, html.zp-entering #connect-svg, html.zp-entering [id^="zp-sc-"], html.zp-entering [id^="zp-sb-"], html.zp-entering svg[id$="-svg"], html.zp-entering [id$="-lines-clip"], html.zp-entering #c-ding-left-blank-frame, html.zp-entering #blank-period-right-line-overlay, html.zp-entering #c-ding-ai-box, html.zp-entering #bottom-frame-line-wrap, html.zp-entering #fullpage-header-line, html.zp-entering #fullpage-edge-line-left, html.zp-entering #fullpage-edge-line-right, html.zp-entering #full-page-function-zone-outline, html.zp-entering #data-blank-divider-line, html.zp-entering div[id^="c-mode-"], html.zp-entering div[id^="e-mode-"], html.zp-entering svg[id^="c-mode-"], html.zp-entering svg[id^="e-mode-"]{ visibility:hidden !important; }/* 2026-09-28 使用者回報「會先看到連線再看到畫面出現」：三層的紅框/綠線/紅線、單桿把手/標籤、C式E式連線等浮在開獎單上的圖層一起藏 */
 </style>
 <script>(function(){var raf=0,t0=0,last="",same=0,guard=0,lastScreen="",lastW=0,minMs=100;/* 2026-10-04 00:04 最少藏 0.3→0.1 秒：手機診斷版實測版面 0.22 秒穩定、0.27 秒已連續 2 幀，0.2 秒門檻反而多等 60ms；穩定判斷照舊 */
-var SCREEN=["catch-card-fit-mode"/* 主程式九宮格(抓牌首頁) */,"zhuapai-mode","pinch-fullscreen-mode","zp-sanceng","zp-single-bar","recent-only-mode","magnifier-mode","c-mode-active","game-wide","game-mark6","game-lotto"];
+var SCREEN=["catch-card-fit-mode"/* 主程式九宮格(抓牌首頁) */,"zhuapai-mode","pinch-fullscreen-mode",/* 2026-10-05 05:05 三層(zp-sanceng)進出是同一幀換版，不用遮罩(遮罩反而讓畫面灰一下、像跳動；同新程式 03:35) */"zp-single-bar","recent-only-mode","magnifier-mode","c-mode-active","game-wide","game-mark6","game-lotto"];
 function screenSig(){var b=document.body.classList;return SCREEN.filter(function(c){return b.contains(c)}).join(" ")}
 function sig(){var td=null,list=document.querySelectorAll("#panels td.num");for(var i=0;i<list.length&&i<400;i++){var r0=list[i].getBoundingClientRect();if(r0.height>0&&r0.bottom>0&&r0.top<innerHeight){td=list[i];break}}
   var P=document.getElementById("panels"),S=document.querySelector(".scroller");var r=td?td.getBoundingClientRect():{left:0,top:0,width:0,height:0};
