@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-06 12:08";/* 2026-10-06 01:15 鐵則 22：八卦輪＝-11、-1、+9、+10、+11、+1、-9、-10 循環；八卦差(d)＝八卦輪上 d 的左右隔壁兩個差(例 -1 → -11 與 +9；-10 → -9 與 -11)。日後功能一律取這兩個常數(三個程式同一份定義) */window.ZP_BAGUA_WHEEL=[-11,-1,9,10,11,1,-9,-10];window.ZP_BAGUA_NEIGHBORS=function(d){const w=window.ZP_BAGUA_WHEEL;const i=w.indexOf(d);if(i<0)return null;return [w[(i+w.length-1)%w.length],w[(i+1)%w.length]]};/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-07 10:27";/* 2026-10-06 01:15 鐵則 22：八卦輪＝-11、-1、+9、+10、+11、+1、-9、-10 循環；八卦差(d)＝八卦輪上 d 的左右隔壁兩個差(例 -1 → -11 與 +9；-10 → -9 與 -11)。日後功能一律取這兩個常數(三個程式同一份定義) */window.ZP_BAGUA_WHEEL=[-11,-1,9,10,11,1,-9,-10];window.ZP_BAGUA_NEIGHBORS=function(d){const w=window.ZP_BAGUA_WHEEL;const i=w.indexOf(d);if(i<0)return null;return [w[(i+w.length-1)%w.length],w[(i+1)%w.length]]};/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -200,6 +200,13 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
     ②八卦差＝八卦輪上某個差的左右「隔壁」兩個差：例 -1 的八卦差是 -11 與 +9；-10 的八卦差是 -9 與 -11(繞回)；+10 的是 +9 與 +11。程式裡取 window.ZP_BAGUA_NEIGHBORS(d) → [左, 右]。
     ③這裡的「隔壁」指八卦輪上的相鄰位置，跟「★抓牌九招總表」裡的隔壁差(-1、0、+1：號碼的隔壁)是兩回事，不可混用。
     ④套用方式(加在哪個號碼上、何時用、顯示在哪)等使用者指定功能時再定義；目前只是名詞與常數。
+ 23. ★X差(2026-10-05 使用者規定「鐵律」，2026-10-07 10:27 補進網站版；鎖定，沒有使用者指令不可更改)：
+    ①定義：X差＝-11、-9、0、+9、+11 五個差，一個都不能多、不能少。即九宮差的四個斜角(-11 左上、-9 右上、+9 左下、+11 右下)加同號 0，在一列 10 格的號碼盤上排成 X 形。
+    ②跟其他差數組分開：不是十字差、九宮差、同尾差、隔壁差，也不是八卦輪(鐵則 22)；不可拿掉 0(四方差去掉 0 已回測證明變差、整組刪除)。
+    ③繞回：加減超出範圍照共用規則繞回(539/天天樂 1～39、六合彩/大樂透 1～49；例 39＋9＝09、05－11＝33)。
+    ④程式唯一來源：抓牌視窗區段的常數 XS＝[-11,-9,0,9,11]，全域 window.ZP_X_DIFF；任何功能要用 X差一律讀這裡。
+    ⑤使用處：第10/11招的第二段(第一段仍用十字差，見「抓牌九招總表」)。其他地方要用 X差等使用者指示。
+    ⑥主程式、副程式一起：主程式(Ai抓牌)也要寫入同一個定義與常數(鐵則 2)。
 ────────────────────────────────────────
 一、畫面一覽
 ────────────────────────────────────────
@@ -309,7 +316,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   ④範圍內開出這組號碼的格子用標定(粉紅)顯示；範圍以外不顯示。範圍從上到下連成一段，段越長＝這組號碼連續中獎的期數越多。
   目前使用處：十字鍵系統藍鍵每一步(見「十字鍵系統藍鍵」)。「全」不用中獎範圍，照舊整個畫面標定註記欄號碼。
  ★抓牌九招總表(2026-10-02 17:17 使用者命名第6～9招，並指示「邏輯要寫清楚，抓牌一到九招全部寫進程式」；本段為九招的權威定義，細節與回測見上下各段)：
-  名詞：十字差＝0、+10、-10、+1、-1；九宮差＝-11、-10、-9、-1、0、+1、+9、+10、+11；同尾差＝-10、0、+10；隔壁差＝-1、0、+1。
+  名詞：十字差＝0、+10、-10、+1、-1；九宮差＝-11、-10、-9、-1、0、+1、+9、+10、+11；同尾差＝-10、0、+10；隔壁差＝-1、0、+1；X差＝-11、-9、0、+9、+11(2026-10-05 使用者定義；九宮差的四個斜角加 0，在 10 格一列的號碼盤上排成 X 形；鎖定見鐵則 23)。
         號碼加差數超過範圍就繞回(539/天天樂 1～39、六合彩/大樂透 1～49；例 39+1＝01、01-1＝39)。單桿＝單桿所在那一期的開獎號碼(5 或 6 顆)。
   共用「第一段」(求 L)：單桿每顆號碼各加上差數組的每個差，得到的號碼逐一記票(同號累加)；取票數最高的前二名(同票數並列全取)，
         前二名合計超過 18 顆就剔除最後一名(票數較低那整批)；再超過第一二期格數(539/天天樂 10 格、六合彩/大樂透 12 格)也剔除最後一名；只剩一名時不再剔除。排序＝票數高→低，同票號碼小→大。
@@ -323,6 +330,9 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   第7招＝同尾差的第二段 S 的前 3 顆(把第3招的十字差換成同尾差：第一段、第二段都用同尾差)。
   第8招＝隔壁差的第一段 L(把第1招的十字差換成隔壁差)。
   第9招＝隔壁差的第二段 S 的前 3 顆(把第3招的十字差換成隔壁差：第一段、第二段都用隔壁差)。
+  第10招(使用者 2026-10-05 指示新增、2026-10-07 10:27 補進網站版，原九招不動)＝第一段用十字差(L 同第1招)、第二段改用 X差 的統計表 S(規則同第2招，只把第二段的差數組換成 X差)。
+  第11招＝第10招統計表的前 3 顆(不足 3 顆有幾顆取幾顆)。第二段沒有任何配對時第10、11招都「無」。程式 tenX()、window.__zpTenX；目前只計算，未放進九招視窗、最漂亮 3 顆、A/B 計票。
+        回測(2026-10-05，三期內開出率，每顆號碼計；順序 539、天天樂、六合彩、大樂透)：30 期 第11招 35.6%、46.0%、47.0%、41.7%(第3招 41.1%、40.0%、35.6%、31.0%)；100 期 第11招 32.4%、37.7%、35.6%、35.0%。539 不建議用第10/11招。
   ★無配對就「無」(2026-10-03 17:53 使用者指示)：同尾差、隔壁差這兩種，單桿裡沒有任何兩顆符合該差數的配對(含繞回，例 07 與 36 差 10、39 與 01 差 1)時，
         候選號全部只有 1 票，第一段不會保留整批 15 顆、第二段也不取前 3，兩招都顯示「無」(第6/7、8/9招)。十字差、九宮差有 0 與多個差數，維持原規則。
         (原因：沒配對時第一段＝單桿每顆加減差數的全列、第二段前 3 ＝單桿最小 3 顆，沒有篩選意義；539 回測 30 桿有 6 桿同尾差、若干桿隔壁差屬此情況。)
@@ -518,6 +528,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-07 10:27  使用者指示「補上 X差與第10/11招」：10/05 做的 X差(定義、鐵律)與第10/11招當時沒有上傳，這次補進網站版(以 10/06 12:08 版為基礎)。X差寫成鐵則 23(鐵則 21、22 已被回前景排版、八卦輪使用)；cross() 加第 6 個參數 O2(沒給＝同第一段，原九招結果不變)；新增 XS／window.ZP_X_DIFF、tenX()、window.__zpTenX；九招總表補第10/11招與回測。只計算，未放進九招視窗。同時修正 sw.js：其他網頁(haoyun.html)不再被存成 index.html。
    2026-10-06 12:08  使用者指示「主程式 副程式 也補到最新」：內建資料依私人資料庫 Lottery-database 的 data.json 補到最新：今彩539 補 10-03(六) 05 28 29 33 38、10-05(一) 02 05 08 16 31；加州天天樂 補 10-04(日) 06 10 15 18 33、10-05(一) 16 17 19 31 37、10-06(二) 03 16 18 27 28；香港六合彩 補 10-03(六) 08 23 29 31 34 43＋48；大樂透無新期。程式行為不變；開機時內建資料以日期合併進手機資料庫(localStorage 539app_db_*＋IndexedDB)，雲端同步照常。
    2026-10-06 01:15  使用者指示「三個程式都定義」：名詞「八卦輪」＝-11、-1、+9、+10、+11、+1、-9、-10 循環，「八卦差」＝八卦輪上隔壁兩個差(例 -1 → -11 與 +9；-10 → -9 與 -11)，寫進規格書鐵則第 22 條並鎖定(與新程式鐵則 32 同一份定義)；程式裡加常數 window.ZP_BAGUA_WHEEL 與 window.ZP_BAGUA_NEIGHBORS(d)。程式行為不變。
    2026-10-05 14:02  使用者回報「在 Google 預覽裡」回前景畫面仍被壓扁(11:43／11:45 的修正沒涵蓋)：①Google 預覽這類 WebView 沒有 screen.orientation，原本判斷不到直放就當橫放；改成沒有 orientation 時看實體螢幕寬高(screen.width/height，不會跟著視窗暫時變矮)。②有些 WebView 視窗長回來時不發 resize 事件，沒有人重排；加一個每 0.5 秒的看門狗，抓牌畫面開著、不在背景、不在手勢中、上次排版的尺寸跟現在不同就重排一次(只重算倍率、不重建表格)。規格書鐵則(回前景排版)同步。
@@ -7496,13 +7507,16 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 (function(){
   const GAMES={"539":{name:"539",max:39},daily:{name:"天天樂",max:39},mark6:{name:"六合彩",max:49},lotto:{name:"大樂透",max:49}};
   const DS=[0,10,-10,1,-1];
+  /* 2026-10-07 10:27 鐵則 23「X差」＝-11、-9、0、+9、+11；用在第10/11招的第二段 */
+  const XS=[-11,-9,0,9,11];
+  try{window.ZP_X_DIFF=XS.slice()}catch(e){}
   function gameData(g){let a=null;try{if(g==="539"){a=EMBEDDED_DATA;if(typeof data539Cache!=="undefined"&&Array.isArray(data539Cache)&&data539Cache.length&&(!a||!a.length||data539Cache[data539Cache.length-1].date>a[a.length-1].date))a=data539Cache}else if(g==="daily")a=EMBEDDED_DAILY_DATA;else if(g==="mark6")a=EMBEDDED_MARK6_DATA;else if(g==="lotto")a=EMBEDDED_LOTTO_DATA}catch(e){}
     return(a||[]).filter(function(r){return r&&r.date&&r.numbers&&r.numbers.length}).slice().sort(function(x,y){return x.date<y.date?-1:x.date>y.date?1:0}).map(function(r){return{date:r.date,numbers:r.numbers.map(Number),special:r.special!=null&&r.special!==""?Number(r.special):null}})}
   function top(cnt){const ks=Object.keys(cnt).map(Number);const vals=[];ks.forEach(function(k){if(vals.indexOf(cnt[k])<0)vals.push(cnt[k])});vals.sort(function(a,b){return b-a});const lv=vals.slice(0,2);
     while(lv.length>1&&ks.filter(function(k){return lv.indexOf(cnt[k])>=0}).length>18)lv.pop();
     return ks.filter(function(k){return lv.indexOf(cnt[k])>=0}).sort(function(a,b){return cnt[b]-cnt[a]||a-b})}
-  function cross(bar,mx,O,needPair,hist){O=O||DS;const w=function(z){return((z-1)%mx+mx)%mx+1};const c={};bar.forEach(function(n){O.forEach(function(d){const t=w(n+d);c[t]=(c[t]||0)+1})});/* 2026-10-03 17:53 使用者指示：同尾差／隔壁差，單桿裡沒有符合該差數的配對(含繞回，所有候選號都只有 1 票)就「無」——第一段、第二段都不出號 */if(needPair){let mxv=0;Object.keys(c).forEach(function(k){if(c[k]>mxv)mxv=c[k]});if(mxv<2)return{L:[],S2:[],S2v:[],S3:[],noPair:true}}let L=top(c);/* 2026-10-02 16:42 第1招超過第一二期格數(10 格；六合彩/大樂透 12 格)剔除最後一名，同十字鍵系統 */{const cap=mx>=49?12:10;while(L.length>cap){const lo=c[L[L.length-1]];if(c[L[0]]===lo)break;L=L.filter(function(v){return c[v]!==lo})}}const c2={};
-    L.forEach(function(X){O.forEach(function(d){if(bar.indexOf(w(X+d))>=0)L.forEach(function(Y){if(Y!==X){const t=w(Y+d);c2[t]=(c2[t]||0)+1}})})});
+  function cross(bar,mx,O,needPair,hist,O2){O=O||DS;/* 2026-10-07 10:27 O2＝第二段另用的差數組(第10/11招)；沒給就跟第一段同一組，原九招不受影響 */const OB=O2||O;const w=function(z){return((z-1)%mx+mx)%mx+1};const c={};bar.forEach(function(n){O.forEach(function(d){const t=w(n+d);c[t]=(c[t]||0)+1})});/* 2026-10-03 17:53 使用者指示：同尾差／隔壁差，單桿裡沒有符合該差數的配對(含繞回，所有候選號都只有 1 票)就「無」——第一段、第二段都不出號 */if(needPair){let mxv=0;Object.keys(c).forEach(function(k){if(c[k]>mxv)mxv=c[k]});if(mxv<2)return{L:[],S2:[],S2v:[],S3:[],noPair:true}}let L=top(c);/* 2026-10-02 16:42 第1招超過第一二期格數(10 格；六合彩/大樂透 12 格)剔除最後一名，同十字鍵系統 */{const cap=mx>=49?12:10;while(L.length>cap){const lo=c[L[L.length-1]];if(c[L[0]]===lo)break;L=L.filter(function(v){return c[v]!==lo})}}const c2={};
+    L.forEach(function(X){OB.forEach(function(d){if(bar.indexOf(w(X+d))>=0)L.forEach(function(Y){if(Y!==X){const t=w(Y+d);c2[t]=(c2[t]||0)+1}})})});
     const op={};/* 2026-10-04 00:41 已開＝跟十字鍵系統註記欄綠框同一套：從單桿那一期往前，連續每一期都至少中一顆的那一段裡中的號碼；遇到一期完全沒中就停 */if(hist&&hist.length){for(let r=hist.length-1;r>=0;r--){const hs=hist[r].filter(function(v){return c2[v]});if(!hs.length)break;hs.forEach(function(v){op[v]=1})}}/* 2026-10-02 16:38 修正：第2招要跟十字鍵系統註記欄同一套——所有次數層級由高到低全部列入，超過 18 顆才從最低一層剔除(原本誤用第1招的「只取前二名」) */const S2=(function(){const ks=Object.keys(c2).map(Number);if(!ks.length)return[];const lv=[];ks.forEach(function(k){if(lv.indexOf(c2[k])<0)lv.push(c2[k])});lv.sort(function(x,y){return y-x});while(lv.length>1&&ks.filter(function(k){return lv.indexOf(c2[k])>=0}).length>18)lv.pop();return ks.filter(function(k){return lv.indexOf(c2[k])>=0}).sort(function(x,y){return c2[y]-c2[x]||x-y})})();/* 2026-10-02 16:06 使用者指示「第2招超過 6 顆只取第一名」(只用在這個視窗) */const S2v=S2.length>6?S2.filter(function(v){return c2[v]===c2[S2[0]]}):S2;/* 2026-10-04 00:41 S3＝第3招(同尾／隔壁差則為第7／9招)：照次數排名取前 3，已開的忽略不計、由同次數的遞補，次數低於原第 3 名的不能補(使用者指示，更正 00:20 的「同票排後面」) */const S3=S2.slice(0,3);/* 2026-10-04 01:23 使用者決定「舊的最穩定」：第3／7／9招還原為統計表前 3 顆；已開(op)只保留計算不影響取號 */return{L:L,S2:S2,S2v:S2v,S3:S3}}
   function picks(data,max){const n=data.length;if(n<3)return{a:[],b:[]};const half=Math.floor(max/2);
     const w=function(x,o){return((x-1+o)%max+max)%max+1};const map=function(nums,o){const s={};nums.forEach(function(x){s[w(x,o)]=1});return Object.keys(s).map(Number)};
@@ -7522,7 +7536,10 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   function five(nums,i,max){const cr=cross(nums[i],max,null,false,nums.slice(Math.max(0,i-15),i+1));const pk=picks(nums.slice(0,i+1),max);return[cr.L,cr.S2v,cr.S3,pk.a,pk.b]}
   /* 2026-10-02 17:22 使用者指示「視窗最上面那個不變，下面的一二三四五招改成一、三、六、七、八、九招」：six()＝第1招(十字差 L)、第3招(十字差統計表前 3)、第6招(同尾差 L)、第7招(同尾差統計表前 3)、第8招(隔壁差 L)、第9招(隔壁差統計表前 3)；最上面「最漂亮 3 顆」仍用 five() 原五招算 */
   /* 2026-10-02 22:08 使用者指示「把九招最漂亮的 3 號顯示在彩券名稱後面」：nine()＝抓牌第1～9招(第2招用完整統計表 S2，不縮減) */function nine(nums,i,max){const __h=nums.slice(Math.max(0,i-15),i+1);const a=cross(nums[i],max,null,false,__h),b=cross(nums[i],max,[-10,0,10],true,__h),c=cross(nums[i],max,[-1,0,1],true,__h);const pk=picks(nums.slice(0,i+1),max);return[a.L,a.S2,a.S3,pk.a,pk.b,b.L,b.S3,c.L,c.S3]}
-  /* 2026-10-03 19:18 使用者指示刪除「四方差」(16:48 曾定義為 -10、-1、+10、+1)：回測證明少了 +0 這一票，第一段選不到單桿本身、第二段中桿機會大減，第2/3招命中率下降，故整組移除 */const KS=[1,3,6,7,8,9];function six(nums,i,max){const __h=nums.slice(Math.max(0,i-15),i+1);const a=cross(nums[i],max,null,false,__h),b=cross(nums[i],max,[-10,0,10],true,__h),c=cross(nums[i],max,[-1,0,1],true,__h);return[a.L,a.S3,b.L,b.S3,c.L,c.S3]}
+  /* 2026-10-03 19:18 使用者指示刪除「四方差」(16:48 曾定義為 -10、-1、+10、+1)：回測證明少了 +0 這一票，第一段選不到單桿本身、第二段中桿機會大減，第2/3招命中率下降，故整組移除 *//* 2026-10-07 10:27 第10招＝第一段十字差、第二段 X差 的統計表；第11招＝其前 3 顆。只計算，未放進九招視窗。window.__zpTenX(彩券代號, 回溯期數)＝{date,bar,L,s10,s11} */
+  function tenX(nums,i,max){const __h=nums.slice(Math.max(0,i-15),i+1);const r=cross(nums[i],max,DS,false,__h,XS);return{L:r.L,s10:r.S2,s11:r.S3}}
+  try{window.__zpTenX=function(g,back){const G=GAMES[g];if(!G)return null;const data=gameData(g);const i=data.length-1-(back||0);if(i<0)return null;const nums=data.map(function(r){return r.numbers});const r=tenX(nums,i,G.max);return{date:data[i].date,bar:nums[i].slice(),L:r.L,s10:r.s10,s11:r.s11}}}catch(e){}
+  const KS=[1,3,6,7,8,9];function six(nums,i,max){const __h=nums.slice(Math.max(0,i-15),i+1);const a=cross(nums[i],max,null,false,__h),b=cross(nums[i],max,[-10,0,10],true,__h),c=cross(nums[i],max,[-1,0,1],true,__h);return[a.L,a.S3,b.L,b.S3,c.L,c.S3]}
   function compute(g,back){const G=GAMES[g];const data=gameData(g);const n=data.length;if(n<40)return null;const nums=data.map(function(r){return r.numbers});/* 2026-10-03 02:20 捲動回溯：e＝本期(最新往前第 back 期) */const e=n-1-(back||0);if(e<40)return null;
     const stat=[0,1,2,3,4,5].map(function(){return{t:0,h:0}});
     for(let i=e-32;i<=e-3;i++){const f=six(nums,i,G.max);const fut={};nums.slice(i+1,i+4).forEach(function(a){a.forEach(function(v){fut[v]=1})});

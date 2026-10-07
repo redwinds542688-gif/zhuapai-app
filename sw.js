@@ -4,8 +4,10 @@
    ・版本檢查只讀檔案開頭(Range)，這種請求直接上網，不存進快取。
    ・圖示、manifest.json 等其他檔案：先用手機裡的(開得快)，同時在背景更新。
    ・換上新版 sw.js 後立刻接管所有畫面(skipWaiting + clients.claim)，並刪掉舊版快取。
-   以後修改這個檔案時把 CACHE 的版本號加 1。 */
-const CACHE = "zhua539-v3";
+   以後修改這個檔案時把 CACHE 的版本號加 1。
+   2026-10-07 10:27(v4)：同一個網站多了 haoyun.html(好運旺旺進財來)。原本任何 .html 都被存成 ./index.html，沒網路時打開抓539 可能跑出別的網頁；
+   改成照網頁自己的檔名存(網址結尾是 / 的才算 index.html)，沒網路時也照檔名找。 */
+const CACHE = "zhua539-v4";
 const CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
@@ -26,6 +28,12 @@ self.addEventListener("activate", function (e) {
     }).then(function () { return self.clients.claim(); })
   );
 });
+
+/* 網頁存進手機時用的名稱：網址結尾是 / 或 index.html → ./index.html；其他網頁(例如 haoyun.html)用自己的檔名 */
+function pageKey(u) {
+  const name = u.pathname.split("/").pop();
+  return (!name || name === "index.html") ? "./index.html" : "./" + name;
+}
 
 function isPage(req) {
   if (req.mode === "navigate") return true;
@@ -49,10 +57,10 @@ self.addEventListener("fetch", function (e) {
   if (isPage(req)) {
     e.respondWith(
       fetch(req, { cache: "no-store" }).then(function (r) {
-        if (r && r.ok) { const copy = r.clone(); caches.open(CACHE).then(function (c) { c.put("./index.html", copy); }); }
+        if (r && r.ok) { const copy = r.clone(); caches.open(CACHE).then(function (c) { c.put(pageKey(u), copy); }); }
         return r;
       }).catch(function () {
-        return caches.match(req, { ignoreSearch: true }).then(function (m) { return m || caches.match("./index.html"); });
+        return caches.match(pageKey(u)).then(function (m) { return m || caches.match(req, { ignoreSearch: true }); });
       })
     );
     return;
