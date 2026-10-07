@@ -8,7 +8,7 @@ https://redwinds542688-gif.github.io/zhuapai-app/
 
 | 檔案 | 內容 | 注意 |
 |---|---|---|
-| `index.html` | 「抓539」主程式（副程式） | 很大，裡面有規格書、鐵則、修改紀錄。不要被 haoyun.html 覆蓋 |
+| `index.html` | 「抓539」（副程式；主程式是 Ai抓牌，不在這個儲存庫） | 很大，裡面有規格書、鐵則、修改紀錄。不要被 haoyun.html 覆蓋 |
 | `haoyun.html` | 「好運旺旺進財來」推薦程式 | 從爬蟲閘道 lottery-data-gate 自動同步開獎資料 |
 | `sw.js` | 離線背景程式 | 修改時把 `CACHE` 版本號加 1 |
 | `manifest.json`、`icon-*.png`、`apple-touch-icon.png` | 抓539 的安裝設定與圖示 | 一般不動 |
