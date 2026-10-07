@@ -121,7 +121,7 @@ function makeEngine(gk,rows,trackStartDate){
  const P=[];for(let x=0;x<20;x++)for(let y=x+1;y<20;y++)P.push([x,y]);
  function cohit(x,y,from,to){let both=0,co=0;for(let i=Math.max(0,from);i<=to;i++){const A=get(x,i),B=get(y,i);if(!A.length||!B.length)continue;both++;const d=new Set(nums[i+1]);if(A.some(v=>d.has(v))&&B.some(v=>d.has(v)))co++}return{both,co}}
  const rp={};function rankPairs(b){if(rp[b])return rp[b];const R=P.map(([x,y])=>{const a=cohit(x,y,b-30,b-1);let sc=a.both?a.co/a.both:0;let tr=null;if(T0>=0&&b-1>=T0){const t=cohit(x,y,T0,b-1);if(t.both>=10){tr=t.co/t.both;sc=0.7*sc+0.3*tr}}return{x,y,both:a.both,co:a.co,sc,tr}}).filter(o=>o.both>=10).sort((p,q)=>q.sc-p.sc||q.co-p.co);return rp[b]=R}
- function relPick(b){const R=rankPairs(b);const c={},f={};const used=[];for(const o of R){if(Object.keys(c).length>=5)break;const A=get(o.x,b),B=get(o.y,b);if(!A.length||!B.length)continue;used.push(o);[...A,...B].forEach((v,z)=>{c[v]=(c[v]||0)+1;if(f[v]===undefined)f[v]=used.length*10+z})}
+ function relPick(b){const R=rankPairs(b);const c={},f={};const used=[];for(const o of R){if(Object.keys(c).length>=8)break;/* 2026-10-07 使用者：關聯推薦固定 8 顆（湊到 8 顆以上再依票數取前 8） */const A=get(o.x,b),B=get(o.y,b);if(!A.length||!B.length)continue;used.push(o);[...A,...B].forEach((v,z)=>{c[v]=(c[v]||0)+1;if(f[v]===undefined)f[v]=used.length*10+z})}
   const ord=Object.keys(c).map(Number).sort((x,y)=>c[y]-c[x]||f[x]-f[y]).slice(0,8);return{nums:ord,used,c}}
  function recommend(b){const K=chooseK(b);return{K,rank:rankPick(b,K),rel:relPick(b)}}
  // 成效紀錄：追蹤單桿 T0..e-1（下一期已開）
@@ -280,7 +280,7 @@ build();sizes();render();addEventListener('resize',()=>{sizes()});setTimeout(syn
 好運旺旺進財來 規則（2026-10-07 與使用者定案）
 一、方法 20 種：十字差(0,±1,±10)、同尾差(0,±10)、隔壁差(0,±1)、X差(0,±9,±11)；兩段組合 16 種取統計表前 3 顆，單用 4 種取第一段基數。繞回 539/天天樂 1~39、六合彩/大樂透 1~49；特別號不計命中。
 二、排行推薦：每期回溯 30 期，20 種方法依三期內開出率排名（同分看 100 期）；取前 5 名（六合彩前 3 名）。兩段組合無號碼時拆成第一段單用＋第二段單用一起統計取 3 顆，兩邊都無才跳下一名。依票數取前 3 顆，同票時排名高者優先；採用的方法合起來不足 3 顆時，繼續往下一名找，直到湊滿 3 顆。
-三、關聯推薦：每期回溯 30 期，190 組配對統計兩方法在同一期各中至少 1 顆的比例（兩方法皆有號碼至少 10 期）；從最高配對起取兩方法號碼聯集，任一方法無號碼就換下一組；不足 5 顆繼續加入下一組，超過 8 顆依票數取前 8 顆。
+三、關聯推薦：每期回溯 30 期，190 組配對統計兩方法在同一期各中至少 1 顆的比例（兩方法皆有號碼至少 10 期）；從最高配對起取兩方法號碼聯集，任一方法無號碼就換下一組；2026-10-07 起固定 8 顆：不足 8 顆繼續加入下一組，超過 8 顆依票數取前 8 顆（配對全部用完仍不足才少於 8 顆）。
 資料：每次打開自動從爬蟲資料庫（lottery-data-gate 閘道）同步新期數，讀不到就用內建資料；新期數存在手機 localStorage。
 四、成效紀錄：自追蹤起點的下一期開始，不回填。排行推薦看三期內開出（未滿三期為觀察中）；關聯推薦看同期中幾顆，與同顆數隨機期望比較。
 五、成效回饋：方法與配對的追蹤實際命中滿 10 期後，排名分數＝回溯30期×0.7＋追蹤實際×0.3；每滿 10 期比較前 3 名與前 5 名的實際成效，較好者用於排行推薦；排行推薦累積滿 60 顆仍低於隨機、或關聯推薦滿 20 筆仍低於隨機期望，標示「暫停參考」。
