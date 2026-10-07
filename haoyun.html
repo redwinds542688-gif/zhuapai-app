@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>好運旺旺進財來</title>
+<!-- 2026-10-07 網址 App：可「加到主畫面／安裝應用程式」，獨立圖示、全螢幕開啟（與抓539 分開） -->
+<link rel="manifest" href="haoyun.webmanifest">
+<meta name="theme-color" content="#0E1726">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="好運旺旺">
+<link rel="apple-touch-icon" href="haoyun-apple-touch.png">
+<link rel="icon" type="image/png" href="haoyun-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&family=Roboto+Condensed:wght@700&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -274,6 +283,7 @@ async function sync(){if(syncing)return;syncing=true;try{
  if(added)reinit()
 }catch(e){SYNC_NOTE='讀不到雲端，使用手機裡的資料'}finally{syncing=false}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync()});setInterval(sync,600000);
+/* 網址 App：註冊離線程式（跟抓539 共用 sw.js；只在 GitHub 網站上） */try{if('serviceWorker' in navigator&&location.protocol==='https:'&&/github\.io$/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 build();sizes();render();addEventListener('resize',()=>{sizes()});setTimeout(sync,200);setTimeout(warm,600);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>sizes());
 </script>
 <!--
