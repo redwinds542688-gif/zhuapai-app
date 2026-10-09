@@ -73,7 +73,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   });
 }catch(e){}})();</script>
 <style>/* 2026-09-27 使用者指示「手機/平板直屏盡可能不捲動」：直立時抓牌/三層/單桿畫面鎖住整頁捲動(原本多出十幾 px 可以輕微捲動)；橫放(可捲動模式)不受影響 */@media (orientation:portrait){ html.is-mobile:has(body.zhuapai-mode:not(.zp-land-scroll)), html.is-mobile body.zhuapai-mode:not(.zp-land-scroll){ overflow:hidden !important; } }</style>
-<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-09 22:26";/* 2026-10-06 01:15 鐵則 22：八卦輪＝-11、-1、+9、+10、+11、+1、-9、-10 循環；八卦差(d)＝八卦輪上 d 的左右隔壁兩個差(例 -1 → -11 與 +9；-10 → -9 與 -11)。日後功能一律取這兩個常數(三個程式同一份定義) */window.ZP_BAGUA_WHEEL=[-11,-1,9,10,11,1,-9,-10];window.ZP_BAGUA_NEIGHBORS=function(d){const w=window.ZP_BAGUA_WHEEL;const i=w.indexOf(d);if(i<0)return null;return [w[(i+w.length-1)%w.length],w[(i+1)%w.length]]};/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
+<script>/* APP_BUILD＝最後修改時間(台灣時間，到分鐘)，只做內部紀錄，不顯示在畫面。規則：每次修改程式(不論大小)都要更新 APP_BUILD，並在下面「修改紀錄」最上面新增一筆；比對兩個檔案哪個新看 APP_BUILD，不要看檔名 */window.APP_BUILD="2026-10-10 01:22";/* 2026-10-06 01:15 鐵則 22：八卦輪＝-11、-1、+9、+10、+11、+1、-9、-10 循環；八卦差(d)＝八卦輪上 d 的左右隔壁兩個差(例 -1 → -11 與 +9；-10 → -9 與 -11)。日後功能一律取這兩個常數(三個程式同一份定義) */window.ZP_BAGUA_WHEEL=[-11,-1,9,10,11,1,-9,-10];window.ZP_BAGUA_NEIGHBORS=function(d){const w=window.ZP_BAGUA_WHEEL;const i=w.indexOf(d);if(i<0)return null;return [w[(i+w.length-1)%w.length],w[(i+1)%w.length]]};/* 2026-09-24 18:08 使用者問「為什麼沒有版本」：新抓牌系統從主程式分出來時還沒有版本編號，這裡補上(從 v1.0 起編)，顯示在「設定」選單最下面，跟主程式「印」選單的「版本 v1.2」同樣位置與樣式。只做顯示，不送給 Worker(雲端讀資料的網址完全不變)；大改版時才升版本號，小修改只更新 APP_BUILD */window.APP_ID="zhuapai";window.APP_VERSION="v1.0";</script>
 <script>/* 2026-09-24 14:48 蘋果裝置偵測：iPhone/iPod/iPad(含 iPadOS 13 以後偽裝成 Mac 的 iPad)在 <html> 加上 class「is-ios」，只給「蘋果專屬」的 CSS 用(目前：號碼縮小 85%)。Android、電腦不會有這個 class。 */(function(){try{var ua=navigator.userAgent||"";var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(ios)document.documentElement.classList.add("is-ios");/* 2026-09-24 19:27 使用者指示「在 Google 預覽裡比照蘋果處理」：Google「檔案」/雲端硬碟點 HTML 開的預覽是 Android WebView(UA 含「; wv)」)，跟 Chrome 瀏覽器不同。偵測到就加 class「is-preview」，套用跟 iPhone 一樣的開獎單號碼 70% 與置中修正；Android 的 Chrome 瀏覽器(不含 wv)不受影響 */if(!ios&&/Android/.test(ua)&&/; wv\)/.test(ua))document.documentElement.classList.add("is-preview")}catch(e){}})();</script>
 <script>/*
 ================================================================================
@@ -347,6 +347,13 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
         第13招＝同尾＋十字　第14招＝同尾＋X　第15招＝同尾＋隔壁　第16招＝同尾＋同尾
         第17招＝十字(單)　第18招＝X(單)　第19招＝隔壁(單)　第20招＝同尾(單)
         計算目前在「好運旺旺進財來」(排行、關聯、非連、柱碰都用這 20 招)；本程式先只定義，要放進抓牌視窗等使用者指示。主程式 Ai抓牌 也要寫入同一份定義(鐵則 2)。
+  ★單桿基期 5 顆(2026-10-10 01:22 使用者定義；目前只寫規格，程式未實作、畫面不顯示)：
+        ①差數組：六合彩用 X差(0、±9、±11)，539、天天樂、大樂透用十字差(0、±1、±10)(使用者指示「暫時六合用 X 其他用十字」；依長期回測勝負決定，以後長期勝負翻轉才換，不看最近 10 期就換)。
+        ②記票：單桿每顆號碼加上差數組每個差(超出範圍繞回)，得到的號碼逐一記票(同號累加)。
+        ③取號：依票數由高到低取滿 5 顆(不限前兩層；差數含 0，候選號至少 5 顆，一定取得滿)。
+        ④同票：看「差數排行」——該差數組每個差，以單桿前 10 個已開完三期的單桿(b-12～b-3)計算「單桿每顆加該差」的三期內開出率，由高到低排名；
+          號碼由哪些差數得到就把那些名次由好到壞排好，兩顆號碼先比最好的名次，一樣再比第二個，依此類推；全部一樣才看號碼小。
+        ⑤回測(2026-10-10，最近 200 期，每顆下一期／三期內開出率)：539 十字 15.2%／35.8%；天天樂 十字 13.6%／36.7%；六合彩 X 14.1%／34.8%；大樂透 十字 14.3%／35.9%(隨機約 12.2～12.8%／32.4～33.7%)。
         第6～9招顯示在首頁長按彩券鍵的視窗裡(2026-10-02 17:22 起)。
   回測(2026-10-02 17:17，最近 30 期，三期內開出率，每顆號碼計；隨機 539/天天樂 33.7%、六合/大樂 32.4%)：
      第7招(同尾第3招)：539 44.9%、天天樂 41.7%、六合彩 43.3%、大樂透 41.3%；第9招(隔壁第3招)：43.9%、38.1%、42.7%、40.0%。
@@ -534,6 +541,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
    規則：任何「監看畫面變化(MutationObserver)後自動調整」的程式，調整時必須先判斷值有沒有變，沒變就不寫入，不能每次都改 DOM。
 ================================================================================ */</script>
 <script>/* ===== 修改紀錄（內部紀錄，不顯示在畫面；最新的寫在最上面）=====
+   2026-10-10 01:22  使用者定義「單桿基期 5 顆」：六合彩用 X差、其他用十字差，單桿記票取前 5 顆，同票看回溯 10 期差數排行(名次逐一比較)，再同看號碼小；只寫進規格書(★抓牌20招總表之後)，程式與畫面不變。
    2026-10-09 22:26  使用者指示「把組合20招 定義為 抓牌20招」：規格書新增「★抓牌20招總表」(十字/X/隔壁/同尾 兩段組合 16 招＋單用 4 招，跟九招編號各自獨立)；鐵則 23⑤ X差使用處改為抓牌20招。只定義，程式計算不變。
    2026-10-09 22:24  使用者指示：抓牌只保留第1～9招，刪除其餘招式的程式、規格書條文與相關紀錄；X差 定義(鐵則 23)保留但目前無使用處。主程式 Ai抓牌 不在本儲存庫，需另外同步。
    2026-10-07 10:27  使用者指示「補上 X差」：10/05 做的 X差(定義、鐵律)當時沒有上傳，這次補進網站版(以 10/06 12:08 版為基礎)。X差寫成鐵則 23(鐵則 21、22 已被回前景排版、八卦輪使用)；新增 XS／window.ZP_X_DIFF。同時修正 sw.js：其他網頁(haoyun.html)不再被存成 index.html。
